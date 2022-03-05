@@ -1,5 +1,5 @@
-;; init-2.el
-(provide 'init-2)
+;; config.el
+(provide 'config)
 
 ;; UI
 (column-number-mode)
