@@ -3,6 +3,8 @@
 
 ;; UI
 (column-number-mode)
+(menu-bar-mode 1)
+(tool-bar-mode -1)
 
 (require 'color-theme)
 (require 'zenburn)
@@ -58,6 +60,10 @@
             (local-set-key (kbd "'") 'Info-forward-node)
 ))
 
-;; Icicles last because of key bindings
-(require 'icicles)
-(icy-mode 1)
+;; ;; Icicles last because of key bindings
+;; (require 'icicles)
+;; (icy-mode 1)
+
+;; Completion
+(require 'ido)
+(ido-mode t)
