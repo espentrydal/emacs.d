@@ -53,7 +53,7 @@
        (setq custom-file "h:/33-programmer/emacs.d-22/custom-22.el"))
       (t
        ;; Emacs version 23 or later.
-       (setq custom-file "~/.emacs.d/custom.el")))
+       (setq custom-file "~/33-programmer/emacs.d-22/custom.el")))
 (load custom-file)
 
 ;; Autoload mode
