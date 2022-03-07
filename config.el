@@ -50,10 +50,10 @@
 (cond ((and (= emacs-major-version 22)
             (> emacs-minor-version 2))
        ;; Emacs version 22.3.
-       (setq custom-file "h:/33-programmer/emacs.d-22/custom-22.el"))
+       (setq custom-file "h:/33-programmer/emacs.d/custom-22.el"))
       (t
        ;; Emacs version 23 or later.
-       (setq custom-file "~/33-programmer/emacs.d-22/custom.el")))
+       (setq custom-file "~/33-programmer/emacs.d/custom.el")))
 (load custom-file)
 
 ;; Autoload mode
