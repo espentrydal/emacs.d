@@ -47,8 +47,12 @@
 (setq create-lockfiles nil)
 
 ;; Workaround for https://debbugs.gnu.org/34341 in GNU Emacs <= 26.3.
-(when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+(unless system-type 'windows
+        (when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
+          (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
+
+;; Autoload mode
+(global-font-lock-mode 1)
 
 ;; Custom key sequences.
 ;; (global-set-key (kbd "C-c t") 'show-current-time)
@@ -56,14 +60,22 @@
 
 (add-hook 'Info-mode-hook
           (lambda ()
-            (local-set-key (kbd "Ã¦") 'Info-backward-node)
+            (local-set-key (kbd "æ") 'Info-backward-node)
             (local-set-key (kbd "'") 'Info-forward-node)
 ))
-
-;; ;; Icicles last because of key bindings
-;; (require 'icicles)
-;; (icy-mode 1)
 
 ;; Completion
 (require 'ido)
 (ido-mode t)
+
+;; Org
+;;(org-export-html-style )
+
+(cond ((and (= emacs-major-version 22)
+            (> emacs-minor-version 2))
+       ;; Emacs version 22.3.
+       (setq custom-file "h:/33-programmer/emacs.d-22/custom-22.el"))
+      (t
+       ;; Emacs version 23 or later.
+       (setq custom-file "~/.emacs.d/custom.el")))
+(load custom-file)
