@@ -1,6 +1,6 @@
-;; config.el
-;; For Emacs version 23 and later
-(provide 'config)
+;; config-22.el
+;; Config for Emacs version 22.3 (Windows)
+(provide 'config-22)
 
 ;; UI
 (column-number-mode)
@@ -48,7 +48,7 @@
           (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
 
 ;; custom-file
-(setq custom-file "~/33-programmer/emacs.d/custom.el")
+(setq custom-file "h:/33-programmer/emacs.d/custom-22.el")
 (load custom-file)
 
 ;; Autoload mode
@@ -59,8 +59,7 @@
 (add-hook 'Info-mode-hook
           (lambda ()
             (local-set-key (kbd "æ") 'Info-backward-node)
-            (local-set-key (kbd "'") 'Info-forward-node)
-))
+            (local-set-key (kbd "'") 'Info-forward-node)))
 
 ;; Org
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
