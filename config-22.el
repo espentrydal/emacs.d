@@ -2,8 +2,6 @@
 ;; Config for Emacs version 22.3 (Windows)
 (provide 'config-22)
 
-(setq user-emacs-directory "h:/33-programmer/emacs.d/elisp-22")
-
 ;; UI
 (column-number-mode)
 (menu-bar-mode 1)
@@ -76,15 +74,8 @@
     (org-open-at-point)))
 (define-key global-map (kbd "C-c <C-return>") #'org-open-current-frame)
 
-;; (add-to-list 'org-structure-template-alist
-;;              '("P" "
-;; #+TITLE:\n
-;; #+OPTIONS: timestamp: t\n\n?
-;; "))
-
-;;(org-export-html-style )
-
 ;;(require 'remember)
 
 (require 'yasnippet)
-
+(setq yas-snippet-dirs "h:/33-programmer/emacs.d")
+(yas-global-mode 1)
