@@ -2,6 +2,24 @@
 ;; Config for Emacs version 22.3 (Windows)
 (provide 'config-22)
 
+
+;; Write auto-saves and backups to separate directory.
+(make-directory "~/.tmp/emacs/auto-save/" t)
+(setq auto-save-file-name-transforms '((".*" "~/.tmp/emacs/auto-save/" t)))
+(setq backup-directory-alist '(("." . "~/.tmp/emacs/backup/")))
+;; Do not move the current file while creating backup.
+(setq backup-by-copying t)
+;; Disable lockfiles.
+(setq create-lockfiles nil)
+;; Workaround for https://debbugs.gnu.org/34341 in GNU Emacs <= 26.3.
+(unless system-type 'windows
+        (when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
+          (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
+;; custom-file
+(setq custom-file "h:/33-programmer/emacs.d/custom-22.el")
+(load custom-file)
+
+
 ;; UI
 (column-number-mode)
 (menu-bar-mode 1)
@@ -11,7 +29,7 @@
 (require 'zenburn)
 (color-theme-initialize)
 (color-theme-zenburn)
-(set-face-foreground 'font-lock-comment-face "#fc9")
+;;(set-face-foreground 'font-lock-comment-face "#fc9")
 ;; Show stray whitespace.
 (setq-default show-trailing-whitespace t)
 (setq-default indicate-empty-lines t)
@@ -26,33 +44,11 @@
 (setq c-basic-offset 4)
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
+;; Autoload mode
+(global-font-lock-mode 1)
 ;; Highlight matching pairs of parentheses.
 (setq show-paren-delay 0)
 (show-paren-mode)
-
-;; Completion
-(require 'ido)
-(ido-mode t)
-
-;; Write auto-saves and backups to separate directory.
-(make-directory "~/.tmp/emacs/auto-save/" t)
-(setq auto-save-file-name-transforms '((".*" "~/.tmp/emacs/auto-save/" t)))
-(setq backup-directory-alist '(("." . "~/.tmp/emacs/backup/")))
-;; Do not move the current file while creating backup.
-(setq backup-by-copying t)
-;; Disable lockfiles.
-(setq create-lockfiles nil)
-;; Workaround for https://debbugs.gnu.org/34341 in GNU Emacs <= 26.3.
-(unless system-type 'windows
-        (when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
-          (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
-
-;; custom-file
-(setq custom-file "h:/33-programmer/emacs.d/custom-22.el")
-(load custom-file)
-
-;; Autoload mode
-(global-font-lock-mode 1)
 
 ;; Custom key sequences.
 (global-set-key (kbd "C-c d") 'delete-trailing-whitespace)
@@ -61,6 +57,18 @@
           (lambda ()
             (local-set-key (kbd "æ") 'Info-backward-node)
             (local-set-key (kbd "'") 'Info-forward-node)))
+
+
+;; Interactively do things
+(require 'ido)
+(ido-mode t)
+
+
+;; yasnippet
+(require 'yasnippet)
+(setq yas-snippet-dirs "h:/33-programmer/emacs.d")
+(yas-global-mode 1)
+;;(require 'remember)
 
 ;; Org
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
@@ -73,9 +81,3 @@
   (let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
     (org-open-at-point)))
 (define-key global-map (kbd "C-c <C-return>") #'org-open-current-frame)
-
-;;(require 'remember)
-
-(require 'yasnippet)
-(setq yas-snippet-dirs "h:/33-programmer/emacs.d")
-(yas-global-mode 1)
