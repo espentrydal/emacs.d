@@ -2,6 +2,8 @@
 ;; Config for Emacs version 22.3 (Windows)
 (provide 'config-22)
 
+(setq user-emacs-directory "h:/33-programmer/emacs.d/elisp-22")
+
 ;; UI
 (column-number-mode)
 (menu-bar-mode 1)
@@ -56,6 +58,7 @@
 
 ;; Custom key sequences.
 (global-set-key (kbd "C-c d") 'delete-trailing-whitespace)
+(global-set-key (kbd "M-;") 'comment-region)
 (add-hook 'Info-mode-hook
           (lambda ()
             (local-set-key (kbd "æ") 'Info-backward-node)
@@ -65,4 +68,23 @@
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
+
+(defun org-open-current-frame ()
+  "Opens file in current frame."
+  (interactive)
+  (let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
+    (org-open-at-point)))
+(define-key global-map (kbd "C-c <C-return>") #'org-open-current-frame)
+
+;; (add-to-list 'org-structure-template-alist
+;;              '("P" "
+;; #+TITLE:\n
+;; #+OPTIONS: timestamp: t\n\n?
+;; "))
+
 ;;(org-export-html-style )
+
+;;(require 'remember)
+
+(require 'yasnippet)
+
