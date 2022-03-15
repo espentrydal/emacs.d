@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: org-title
-# key: <ot
-# binding:
-# expand-env:
-# type: snippet
-# --
-#+TITLE: 
-#+OPTIONS: timestamp:t
