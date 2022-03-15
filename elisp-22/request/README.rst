@@ -39,12 +39,15 @@ Examples
 GET::
 
   (request
-   "http://httpbin.org/get"
-   :params '(("key" . "value") ("key2" . "value2"))
+   "http://search.twitter.com/search.json"
+   :params '((q . "emacs awesome"))
    :parser 'json-read
-   :success (cl-function
+   :success (function*
              (lambda (&key data &allow-other-keys)
-               (message "I sent: %S" (assoc-default 'args data)))))
+               (let* ((tweet (elt (assoc-default 'results data) 0))
+                      (text (assoc-default 'text tweet))
+                      (user (assoc-default 'from_user_name tweet)))
+                 (message "%s says %s" user text)))))
 
 POST::
 
@@ -54,7 +57,7 @@ POST::
    :data '(("key" . "value") ("key2" . "value2"))
    ;; :data "key=value&key2=value2"  ; this is equivalent
    :parser 'json-read
-   :success (cl-function
+   :success (function*
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'form data)))))
 
@@ -66,7 +69,7 @@ POST file (**WARNING**: it will send the contents of the current buffer!)::
    :files `(("current buffer" . ,(current-buffer))
             ("data" . ("data.csv" :data "1,2,3\n4,5,6\n")))
    :parser 'json-read
-   :success (cl-function
+   :success (function*
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'files data)))))
 
@@ -78,15 +81,15 @@ Rich callback dispatch (like `jQuery.ajax`)::
    ;; "http://httpbin.org/status/400"  ; you will see "Got 400."
    :parser 'buffer-string
    :success
-   (cl-function (lambda (&key data &allow-other-keys)
-                  (when data
-                    (with-current-buffer (get-buffer-create "*request demo*")
-                      (erase-buffer)
-                      (insert data)
-                      (pop-to-buffer (current-buffer))))))
+   (function* (lambda (&key data &allow-other-keys)
+                (when data
+                  (with-current-buffer (get-buffer-create "*request demo*")
+                    (erase-buffer)
+                    (insert data)
+                    (pop-to-buffer (current-buffer))))))
    :error
-   (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                  (message "Got error: %S" error-thrown)))
+   (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+                (message "Got error: %S" error-thrown)))
    :complete (lambda (&rest _) (message "Finished!"))
    :status-code '((400 . (lambda (&rest _) (message "Got 400.")))
                   (418 . (lambda (&rest _) (message "Got 418.")))))
@@ -97,7 +100,7 @@ Flexible PARSER option::
    "https://github.com/tkf/emacs-request/commits/master.atom"
    ;; Parse XML in response body:
    :parser (lambda () (libxml-parse-xml-region (point) (point-max)))
-   :success (cl-function
+   :success (function*
              (lambda (&key data &allow-other-keys)
                ;; Just don't look at this function....
                (let ((get (lambda (node &rest names)
@@ -119,37 +122,9 @@ PUT JSON data::
    :data (json-encode '(("key" . "value") ("key2" . "value2")))
    :headers '(("Content-Type" . "application/json"))
    :parser 'json-read
-   :success (cl-function
+   :success (function*
              (lambda (&key data &allow-other-keys)
                (message "I sent: %S" (assoc-default 'json data)))))
-
-Another PUT JSON example (nested JSON using alist structure, how to represent a boolean & how to selectively evaluate lisp)::
-
-  ;; (1) Prepend alist structure with a backtick (`) rather than single quote (')
-  ;;     to allow elisp evaluation of selected elements prefixed with a comma (,)
-  ;; (2) This value is expected as a boolean so use the nil / t elisp alist denotation
-  ;; (3) The function will be evaluated as it has been prefixed with a comma (,)
-  (request
-   "http://httpbin.org/put"
-   :type "PUT"
-   :data (json-encode `(("jsonArray" . (("item1" . "value 1") ;; (1)
-                                        ("item2" . t)         ;; (2)
-                                        ("item3" . ,(your-custom-elisp-function)))))) ;; (3)
-   :headers '(("Content-Type" . "application/json"))
-   :parser 'json-read
-   :success (cl-function
-             (lambda (&key data &allow-other-keys)
-               (message "I sent: %S" (assoc-default 'json data)))))
-
-GET with Unix domain socket data::
-
-  (request
-   "http:/hello.txt"
-   :unix-socket "/tmp/app.sock"
-   :parser (lambda () (buffer-string))
-   :success (cl-function
-             (lambda (&key data &allow-other-keys)
-               (message "Got: %s" data))))
 
 
 Compatibility / backends
@@ -157,26 +132,26 @@ Compatibility / backends
 
 Supported Emacs versions:
 
-====================== ========================== =====================
- Emacs version          Does request.el work?      Tested on Travis CI
-                                                   |build-status|
-====================== ========================== =====================
- GNU Emacs 24.5         yes (as of this writing)   yes
- GNU Emacs 24.4         yes (as of this writing)   yes
- GNU Emacs 24.3         yes (as of this writing)   yes
- GNU Emacs 24.2         yes                        no
+====================== ========================== =================
+ Emacs version          Does request.el work?      Continues build
+====================== ========================== =================
+ GNU Emacs 24.3-devel   yes (as of this writing)   yes
+ GNU Emacs 24.2         yes                        yes
  GNU Emacs 24.1         yes                        no
-====================== ========================== =====================
+ GNU Emacs 23.4         yes                        no
+ GNU Emacs 23.1         yes                        yes
+ GNU Emacs < 23         ?                          no
+====================== ========================== =================
 
 
 Supported backends:
 
-========== ==================== ================ ========================= =============
- Backends   Remarks              Multipart Form   Automatic Decompression   Unix Socket
-========== ==================== ================ ========================= =============
- url.el     Included in Emacs
- curl       Reliable             ✔               ✔                         ✔
-========== ==================== ================ ========================= =============
+========== ============================================
+ Backends   Remarks
+========== ============================================
+ url.el     Included in Emacs.
+ curl       Reliable.  Needed for multipart form POST.
+========== ============================================
 
 
 Monkey patches for url.el

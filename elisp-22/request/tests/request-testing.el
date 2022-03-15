@@ -1,4 +1,4 @@
-;;; request-testing.el --- Testing framework for request.el -*- lexical-binding: t; -*-
+;;; request-testing.el --- Testing framework for request.el
 
 ;; Copyright (C) 2012 Takafumi Arakaki
 
@@ -26,22 +26,9 @@
 
 ;;; Code:
 
-(require 'cl-lib)
+(eval-when-compile (require 'cl))
 (require 'ert)
 (require 'request-deferred)
-
-
-;; Compatibility
-
-(defun request-testing-string-prefix-p (prefix str &optional ignore-case)
-  (let ((case-fold-search ignore-case))
-    (string-match-p (format "^%s" (regexp-quote prefix)) str)))
-
-(unless (fboundp 'string-prefix-p)      ; not defined in Emacs 23.1
-  (fset 'string-prefix-p (symbol-function 'request-testing-string-prefix-p)))
-
-
-;;;
 
 (defvar request-testing-source-dir
   (file-name-directory (or load-file-name (buffer-file-name))))
@@ -52,25 +39,25 @@
   "Destructure RESPONSE object and execute BODY.
 Following symbols are bound:
 
-  response / status-code / history / data / error-thrown /
+  response / status-code / redirects / data / error-thrown /
   symbol-status / url / done-p / settings / -buffer / -timer
 
-The symbols other than `response' is bound using `cl-symbol-macrolet'."
+The symbols other than `response' is bound using `symbol-macrolet'."
   (declare (indent 1))
   `(let ((response ,response))
-     (cl-symbol-macrolet
-         ,(cl-loop for slot in '(status-code
-                                 history
-                                 data
-                                 error-thrown
-                                 symbol-status
-                                 url
-                                 done-p
-                                 settings
-                                 -buffer
-                                 -timer)
-                   for accessor = (intern (format "request-response-%s" slot))
-                   collect `(,slot (,accessor response)))
+     (symbol-macrolet
+         ,(loop for slot in '(status-code
+                              redirects
+                              data
+                              error-thrown
+                              symbol-status
+                              url
+                              done-p
+                              settings
+                              -buffer
+                              -timer)
+                for accessor = (intern (format "request-response-%s" slot))
+                collect `(,slot (,accessor response)))
        ,@body)))
 
 (defvar request-testing-server--process nil)
@@ -78,16 +65,16 @@ The symbols other than `response' is bound using `cl-symbol-macrolet'."
 
 (defun request-testing--wait-process-until (process output-regexp)
   "Wait until PROCESS outputs text which matches to OUTPUT-REGEXP."
-  (cl-loop with buffer = (process-buffer process)
-           repeat 30
-           do (accept-process-output process 0.1 nil t)
-           for str = (with-current-buffer buffer (buffer-string))
-           do (cond
-               ((string-match output-regexp str)
-                (return str))
-               ((not (eq 'run (process-status process)))
-                (error "Server startup error.")))
-           finally do (error "Server timeout error.")))
+  (loop with buffer = (process-buffer process)
+        repeat 30
+        do (accept-process-output process 0.1 nil t)
+        for str = (with-current-buffer buffer (buffer-string))
+        do (cond
+            ((string-match output-regexp str)
+             (return str))
+            ((not (eq 'run (process-status process)))
+             (error "Server startup error.")))
+        finally do (error "Server timeout error.")))
 
 (defun request-testing-server ()
   "Get running test server and return its root URL."
@@ -117,16 +104,16 @@ The symbols other than `response' is bound using `cl-symbol-macrolet'."
 (add-hook 'kill-emacs-hook 'request-testing-stop-server)
 
 (defun request-testing-url (&rest path)
-  (cl-loop with url = (format "http://127.0.0.1:%s" request-testing-server--port)
-           for p in path
-           do (setq url (concat url "/" p))
-           finally return url))
+  (loop with url = (format "http://127.0.0.1:%s" request-testing-server--port)
+        for p in path
+        do (setq url (concat url "/" p))
+        finally return url))
 
 (defun request-testing-async (url &rest args)
   (apply #'request (request-testing-url url) args))
 
 (defun request-testing-sync (url &rest args)
-  (let (err timeout)
+  (lexical-let (err timeout)
     (let ((result
            (deferred:sync!
              (deferred:timeout
@@ -156,17 +143,17 @@ The symbols other than `response' is bound using `cl-symbol-macrolet'."
 
 (defun request-deftest--tempfiles (tempfiles body)
   "[Macro helper] Execute BODY with TEMPFILES and then remove them."
-  (let ((symbols (cl-loop for f in tempfiles
-                          collect (make-symbol (format "%s*" f)))))
-    `((let ,(cl-loop for s in symbols
-                     collect `(,s (make-temp-file "emacs-request-")))
-        (let ,(cl-loop for f in tempfiles
-                       for s in symbols
-                       collect `(,f ,s))
+  (let ((symbols (loop for f in tempfiles
+                       collect (make-symbol (format "%s*" f)))))
+    `((let ,(loop for s in symbols
+                  collect `(,s (make-temp-file "emacs-request-")))
+        (let ,(loop for f in tempfiles
+                    for s in symbols
+                    collect `(,f ,s))
           (unwind-protect
               (progn ,@body)
-            ,@(cl-loop for s in symbols
-                       collect `(ignore-errors (delete-file ,s)))))))))
+            ,@(loop for s in symbols
+                    collect `(ignore-errors (delete-file ,s)))))))))
 
 (defun request-deftest--backends (backends name body)
   "[Macro helper] Execute BODY only when `request-backend' is in BACKENDS."
@@ -195,8 +182,8 @@ unless an error occurs.")
                   (setq ,noerror t))
               (fset 'message ,orig-message)
               (unless ,noerror
-                (cl-loop for m in (nreverse ,messages)
-                         do (apply #'message m)))))
+                (loop for m in (nreverse ,messages)
+                      do (apply #'message m)))))
         ,@body))))
 
 (defmacro* request-deftest (name () &body docstring-and-body)
@@ -246,7 +233,7 @@ TEMPFILES
     ;; "Decorate" BODY.
     (setq body (request-deftest--capture-message body))
     (setq body (request-deftest--url-retrieve-isolate body))
-    (cl-destructuring-bind (&key backends tempfiles) req-keys
+    (destructuring-bind (&key backends tempfiles) req-keys
       (setq body (request-deftest--tempfiles tempfiles body))
       (setq body (request-deftest--backends backends name body)))
 
