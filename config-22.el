@@ -81,3 +81,6 @@
   (let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
     (org-open-at-point)))
 (define-key global-map (kbd "C-c <C-return>") #'org-open-current-frame)
+
+;;(require 'zotxt)
+;;(require 'org-zotxt)
