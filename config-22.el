@@ -66,7 +66,7 @@
 
 ;; yasnippet
 (require 'yasnippet)
-(setq yas-snippet-dirs "h:/33-programmer/emacs.d")
+(setq yas-snippet-dirs "h:/33-programmer/emacs.d/snippets")
 (yas-global-mode 1)
 ;;(require 'remember)
 

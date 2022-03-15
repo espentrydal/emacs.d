@@ -54,7 +54,7 @@
 (setq-default indicate-empty-lines t)
 (setq-default indicate-buffer-boundaries 'left)
 ;; Consider a period followed by a single space to be end of sentence.
-(setq sentence-end-double-space nil)
+(setq-default sentence-end-double-space nil)
 ;; Use spaces, not tabs, for indentation.
 (setq-default indent-tabs-mode nil)
 ;; Display the distance between two tab stops as 4 characters wide.
@@ -118,8 +118,16 @@
 
 
 ;; yasnippet
-(use-package yasnippet)
-(yas-global-mode)
+(use-package s)
+(use-package yasnippet
+  :init
+  (setq yas-snippet-dirs '("~/33-programmer/emacs.d/snippets"))
+  :custom
+  (require warnings)
+  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+  :config
+  (yas-global-mode 1))
+
 
 ;; lsp-mode
 (use-package lsp-treemacs)
@@ -198,11 +206,19 @@
 (use-package org-download
   :straight (:host github :repo "abo-abo/org-download")
   :after org
-  :custom (setq-default org-download-image-dir "~/org/assets/images")
+  :custom (setq org-download-image-dir "~/org/assets/images")
   :bind ("C-c w . org-download-clipboard"))
 
+;; Org exporter
+(require 'ox)
+(use-package ox-hugo
+  :after ox
+  :custom
+  (setq org-hugo-base-dir "~/03-hugo")
+  (setq org-hugo-default-section-directory "posts"))
+
 ;; Winner mode
-(winner-mode +1)
+(winner-mode 1)
 (define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
 (define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
 
