@@ -222,12 +222,14 @@
   :custom
   (setq org-hugo-base-dir "~/03-hugo")
   (setq org-hugo-default-section-directory "posts"))
-
-;; Winner mode
-(winner-mode 1)
-(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
-(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
+;; Zotxt
+(use-package zotxt)
+(use-package org-zotxt
+  :after zotxt)
 
 ;; PDF-tools
 (use-package pdf-tools
   :straight (:host github :repo "vedang/pdf-tools"))
+
+;; Magit
+(use-package magit)
