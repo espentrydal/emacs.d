@@ -116,6 +116,13 @@
 ;; Helm
 (use-package helm)
 (use-package helm-xref)
+;; Winner mode
+(winner-mode 1)
+(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
+(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
+;; Windmove
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
 
 
 ;; yasnippet
@@ -203,13 +210,11 @@
              (concat (file-name-sans-extension (buffer-file-name))
                  "-att")))
         org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
-
 (use-package org-download
   :straight (:host github :repo "abo-abo/org-download")
   :after org
   :custom (setq org-download-image-dir "~/org/assets/images")
   :bind ("C-c w . org-download-clipboard"))
-
 ;; Org exporter
 (require 'ox)
 (use-package ox-hugo

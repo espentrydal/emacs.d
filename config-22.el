@@ -63,6 +63,13 @@
 ;; Interactively do things
 (require 'ido)
 (ido-mode t)
+;; Winner mode
+(winner-mode 1)
+(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
+(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
+;; Windmove
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
 
 
 ;; yasnippet
@@ -70,6 +77,7 @@
 (setq yas-snippet-dirs "h:/33-programmer/emacs.d/snippets")
 (yas-global-mode 1)
 ;;(require 'remember)
+
 
 ;; Org
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
