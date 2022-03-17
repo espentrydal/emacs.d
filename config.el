@@ -224,8 +224,6 @@
   (setq org-hugo-default-section-directory "posts"))
 ;; Zotxt
 (use-package zotxt)
-(use-package org-zotxt
-  :after zotxt)
 
 ;; PDF-tools
 (use-package pdf-tools
