@@ -1,0 +1,12 @@
+[submodule "elisp-22/org"]
+	path = elisp-22/org
+	url = https://github.com/emacsmirror/org.git
+[submodule "elisp-22/magit"]
+	path = elisp-22/magit
+	url = https://github.com/magit/magit.git
+[submodule "elisp-22/dash.el"]
+	path = elisp-22/dash
+	url = https://github.com/magnars/dash.el.git
+[submodule "elisp-22/dash"]
+	path = elisp-22/dash
+	url = https://github.com/magnars/dash.el.git
