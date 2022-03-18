@@ -7,6 +7,8 @@
 (make-directory "~/.tmp/emacs/auto-save/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.tmp/emacs/auto-save/" t)))
 (setq backup-directory-alist '(("." . "~/.tmp/emacs/backup/")))
+;; For compatibility with request.el
+(setq user-emacs-directory "h:/33-programmer/emacs.d")
 ;; Do not move the current file while creating backup.
 (setq backup-by-copying t)
 ;; Disable lockfiles.
