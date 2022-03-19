@@ -128,6 +128,7 @@
 ;; yasnippet
 (use-package s)
 (use-package yasnippet
+  :after s
   :init
   (setq yas-snippet-dirs '("~/33-programmer/emacs.d/snippets"))
   :custom
@@ -192,14 +193,35 @@
          ("C-c c" . org-capture)
          ("C-c <C-return>" . org-open-current-frame)))
 
-;;(use-package helm-bibtex
-;;  :after helm)
-;;(use-package org-ref
-;;  :after org)
-;;(use-package citar)
-;;(use-package org-roam-bibtex
-;;  :straight (:host github :repo "org-roam/org-roam-bibtex")
-;;  :after (org-roam helm-bibtex org-ref citar))
+(use-package dash)
+(use-package f)
+(use-package emacsql)
+(use-package emacsql-sqlite)
+
+(use-package org-roam
+  :after (org)
+  :custom
+  (org-roam-directory (file-truename "~/02-org/org-roam/"))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
+(use-package helm-bibtex
+  :after helm)
+(use-package org-ref
+  :after org)
+(use-package citar)
+(use-package org-roam-bibtex
+  :after (org-roam helm-bibtex org-ref citar))
 
 (use-package org-attach-screenshot
   :after org
@@ -223,7 +245,7 @@
   (setq org-hugo-base-dir "~/03-hugo")
   (setq org-hugo-default-section-directory "posts"))
 ;; Zotxt
-(use-package zotxt)
+;;(use-package zotxt)
 
 ;; PDF-tools
 (use-package pdf-tools
