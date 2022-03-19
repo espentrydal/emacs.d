@@ -103,20 +103,23 @@
 (global-set-key (kbd "C-c d") 'delete-trailing-whitespace)
 (add-hook 'Info-mode-hook
           (lambda ()
-            (local-set-key (kbd "�") 'Info-backward-node)
+            (local-set-key (kbd "æ") 'Info-backward-node)
             (local-set-key (kbd "'") 'Info-forward-node)
 ))
 (add-hook 'dired-mode-hook
           (lambda ()
-            (local-set-key (kbd "�") 'dired-up-directory)
+            (local-set-key (kbd "å") 'dired-up-directory)
 ))
 
 
 ;; Interactively do things
 (ido-mode t)
 (ido-everywhere)
-(setq ido-enable-flex-matching t)
+(setq ido-enable-flex-matching 1)
 (fido-mode)
+(setq ido-use-filename-at-point 'guess)
+(setq ido-create-new-buffer 'always)
+(define-key minibuffer-local-completion-map (kbd "SPC") 'self-insert-command)
 ;; Helm
 (use-package helm)
 (use-package helm-xref)
@@ -197,11 +200,11 @@
          ("C-c c" . org-capture)
          ("C-c <C-return>" . org-open-current-frame)))
 
+;; org-roam
 (use-package dash)
 (use-package f)
 (use-package emacsql)
 (use-package emacsql-sqlite)
-
 (use-package org-roam
   :after (org)
   :custom
@@ -215,18 +218,56 @@
          ("C-c n j" . org-roam-dailies-capture-today))
   :config
   ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  ;;(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+  (require 'org-roam-protocol)
+
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?"
+           :target (file+head "${slug}.org"
+                              "#+title: ${title}\n#+date: %U\n")
+           :immediate-finish t
+           :unnarrowed t)
+          ("r" "bibliography reference" plain "%?"
+           :target
+           (file+head "ref/${citekey}.org"
+                      "#+title: ${title}\n#+date: %U\n")
+           :unnarrowed t)))
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry
+           "* %?"
+           :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
+                              "#+title: %<%Y-%m-%d-%H%M>\n")))))
+
+;; bibtex
+(setq bibtex-dialect 'biblatex)
+(setq bibtex-completion-bibliography '("~/02-org/ref/my-library.bib")
+      bibtex-completion-pdf-field "File"
+      bibtex-completion-notes-path "~/02-org/ref"
+      bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+	  bibtex-completion-additional-search-fields '(keywords journal)
+      bibtex-completion-pdf-symbol "⌘"
+      bibtex-completion-notes-symbol "✎"
+	  bibtex-completion-display-formats
+	  '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+	    (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+      bibtex-completion-pdf-open-function (lambda (fpath)
+	                                        (call-process "open" nil 0 nil fpath)))
 (use-package helm-bibtex
-  :after helm)
+  :after helm
+  :bind (:map org-mode-map ("C-c n B" . helm-bibtex)))
 (use-package org-ref
   :after org)
 (use-package citar)
 (use-package org-roam-bibtex
-  :after (org-roam helm-bibtex org-ref citar))
+  :after (org-roam helm-bibtex citar)
+  :bind (:map org-mode-map ("C-c n b" . orb-note-actions))
+  :config
+  (org-roam-bibtex-mode))
 
+(use-package org-noter)
 (use-package org-attach-screenshot
   :after org
   :bind ("C-c s" . org-attach-screenshot)
