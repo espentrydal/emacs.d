@@ -60,6 +60,10 @@
           (lambda ()
             (local-set-key (kbd "æ") 'Info-backward-node)
             (local-set-key (kbd "'") 'Info-forward-node)))
+(add-hook 'dired-mode-hook
+          (lambda ()
+            (local-set-key (kbd "å") 'dired-up-directory)
+))
 
 
 ;; Interactively do things
