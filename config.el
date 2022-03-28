@@ -125,8 +125,8 @@
 (use-package helm-xref)
 ;; Winner mode
 (winner-mode 1)
-(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
-(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
+;; (define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
+;; (define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
 ;; Windmove
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
@@ -205,6 +205,9 @@
 (use-package f)
 (use-package emacsql)
 (use-package emacsql-sqlite)
+(require 'time-stamp)
+(add-hook 'write-file-functions 'time-stamp)
+
 (use-package org-roam
   :after (org)
   :custom
@@ -226,19 +229,19 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
            :target (file+head "${slug}.org"
-                              "#+title: ${title}\n#+date: %U\n")
+                              "#+title: ${title}\n#+date: %U\nTime-stamp: <>\n")
            :immediate-finish t
            :unnarrowed t)
           ("r" "bibliography reference" plain "%?"
            :target
            (file+head "ref/${citekey}.org"
-                      "#+title: ${title}\n#+date: %U\n")
+                      "#+title: ${title}\n#+date: %U\nTime-stamp: <>\n")
            :unnarrowed t)))
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry
            "* %?"
            :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
-                              "#+title: %<%Y-%m-%d-%H%M>\n")))))
+                              "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: <>\n")))))
 
 ;; bibtex
 (setq bibtex-dialect 'biblatex)
@@ -294,7 +297,24 @@
 
 ;; PDF-tools
 (use-package pdf-tools
-  :straight (:host github :repo "vedang/pdf-tools"))
+  :straight (:host github :repo "vedang/pdf-tools")
+  :config
+  ;; initialise
+  (pdf-tools-install)
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-page)
+  ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t)
+  ;; use normal isearch
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  ;; turn off cua so copy works
+  (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0)))
+  ;; more fine-grained zooming
+  (setq pdf-view-resize-factor 1.1)
+  ;; keyboard shortcuts
+  (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
+  (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
+  (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
 
 ;; Magit
 (use-package magit)
