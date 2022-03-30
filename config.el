@@ -229,19 +229,19 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
            :target (file+head "${slug}.org"
-                              "#+title: ${title}\n#+date: %U\nTime-stamp: <>\n")
+                              "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
            :immediate-finish t
            :unnarrowed t)
           ("r" "bibliography reference" plain "%?"
            :target
            (file+head "ref/${citekey}.org"
-                      "#+title: ${title}\n#+date: %U\nTime-stamp: <>\n")
+                      "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
            :unnarrowed t)))
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry
            "* %?"
            :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
-                              "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: <>\n")))))
+                              "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: \" \"\n")))))
 
 ;; bibtex
 (setq bibtex-dialect 'biblatex)
