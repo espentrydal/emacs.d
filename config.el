@@ -318,3 +318,7 @@
 
 ;; Magit
 (use-package magit)
+
+;; Slime
+(use-package slime
+  :config (setq inferior-lisp-program "/usr/bin/sbcl"))
