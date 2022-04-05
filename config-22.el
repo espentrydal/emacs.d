@@ -71,8 +71,8 @@
 (ido-mode t)
 ;; Winner mode
 (winner-mode 1)
-(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
-(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
+(define-key winner-mode-map (kbd "<C-M-left>") #'winner-undo)
+(define-key winner-mode-map (kbd "<C-M-right>") #'winner-redo)
 ;; Windmove
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
@@ -97,8 +97,12 @@
     (org-open-at-point)))
 (define-key global-map (kbd "C-c <C-return>") #'org-open-current-frame)
 ;; Zotxt
-(require 'zotxt)
-(require 'org-zotxt)
+;;(require 'zotxt)
+;;(require 'org-zotxt)
+;;Timestamp
+(require 'time-stamp)
+(add-hook 'write-file-functions 'time-stamp)
+
 
 ;; Magit
 ;; (require 'magit)

@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: org-hugo-privat
-# key: <hp
+# name: org-title
+# key: <ot
 # binding:
 # expand-env:
 # type: snippet
@@ -8,8 +8,9 @@
 #+title: `
 (upcase-initials (s-replace "-" " "
     (file-name-nondirectory (file-name-sans-extension (buffer-file-name)))))`
-#+hugo_base_dir: ~/03-hugo/org-privat
+#+filetags: publish
 $0
 :PROPERTIES:
 :CREATED: `(let ((x (org-insert-time-stamp nil t t ))))`
+:MODIFIED: Time-stamp: " "
 :END:
