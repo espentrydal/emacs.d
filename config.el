@@ -229,25 +229,25 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
            :target (file+head "${slug}.org"
-                              "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
+                               "#+title: ${title}\n#+date: %U\n#+Time-stamp: \" \"\n")
            :immediate-finish t
            :unnarrowed t)
           ("r" "bibliography reference" plain "%?"
            :target
            (file+head "ref/${citekey}.org"
-                      "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
+                      "#+title: ${title}\n#+date: %U\n#+Time-stamp: \" \"\n")
            :unnarrowed t)))
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry
            "* %?"
            :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
-                              "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: \" \"\n")))))
+                              "#+title: %<%Y-%m-%d-%H%M>\n#+Time-stamp: \" \"\n")))))
 
 ;; bibtex
 (setq bibtex-dialect 'biblatex)
-(setq bibtex-completion-bibliography '("~/02-org/ref/my-library.bib")
+(setq bibtex-completion-bibliography '("~/02-org/org-jobb/ref/my-library.bib")
       bibtex-completion-pdf-field "File"
-      bibtex-completion-notes-path "~/02-org/ref"
+      bibtex-completion-notes-path "~/02-org/org-jobb/ref"
       bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
 
 	  bibtex-completion-additional-search-fields '(keywords journal)
