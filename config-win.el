@@ -1,4 +1,4 @@
-;; config.el
+;; config-win.el
 ;; For Emacs on Windows (>= 28.1)
 (provide 'config-win)
 
@@ -52,8 +52,12 @@
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 ;; Theme
-(use-package zenburn-theme
-    :init (load-theme 'zenburn t))
+;; (use-package zenburn-theme
+;;   :init (load-theme 'zenburn t))
+(load-theme 'modus-vivendi)
+(use-package smart-mode-line
+  :init
+  (sml/setup))
 ;; Show stray whitespace.
 (setq-default show-trailing-whitespace t)
 (setq-default indicate-empty-lines t)
@@ -289,6 +293,11 @@
   :after org
   :custom (setq org-download-image-dir "~/org/assets/images")
   :bind ("C-c w . org-download-clipboard"))
+;; Org reveal
+(use-package ox-reveal
+  :straight (:host github :repo "yjwen/org-reveal")
+  :config (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
+
 ;; Org exporter
 ;; (require 'ox)
 ;; (use-package ox-hugo
@@ -326,3 +335,18 @@
 ;; ;; Slime
 ;; (use-package slime
 ;;   :config (setq inferior-lisp-program "/usr/bin/sbcl"))
+
+;; Projectile
+(use-package projectile
+  :bind ("C-c p" . projectile-command-map)
+  :init
+  (projectile-mode +1))
+;; Perspectives
+(use-package perspective
+  :bind ("C-x C-b" . persp-ibuffer)
+  :init (persp-mode))
+;; Fix emacs windows behavior
+(customize-set-variable 'display-buffer-base-action
+  '((display-buffer-reuse-window display-buffer-same-window)
+    (reusable-frames . t)))
+(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
