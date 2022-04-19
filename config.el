@@ -248,7 +248,7 @@
        (use-package org-roam
          :after (org)
          :custom
-         (org-roam-directory (file-truename "h:/02-org/org-roam/"))
+         (org-roam-directory (file-truename (file-name-concat home-dir "02-org/org-roam/")))
          :bind (("C-c n l" . org-roam-buffer-toggle)
                 ("C-c n f" . org-roam-node-find)
                 ("C-c n g" . org-roam-graph)
