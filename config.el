@@ -53,6 +53,11 @@
         (when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
           (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
 
+;; Language and coding system
+(set-language-environment "UTF-8")
+(setq-default buffer-file-coding-system 'utf-8-unix)
+
+
 ;; Start server.
 (require 'server)
 (unless (server-running-p)
