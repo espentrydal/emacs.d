@@ -1,7 +1,26 @@
 ;; config.el
-;; For Emacs version 23 and later
 (provide 'config)
 
+;; SUS vs linux hjemme (TODO: windows hjemme)
+(cond ((string-match-p "\\`PC" (system-name))
+       (setq-default url-proxy-services '(("no_proxy" . "sus\\.no")
+                                          ("http" . "proxy-ihn.ihelse.net:3128")
+			                              ("https" . "proxy-ihn.ihelse.net:3128")))
+       (setq default-directory "h:/33-programmer/emacs.d")
+       (setq home-dir "h:/"))
+      (t
+       (setq default-directory "~/33-programmer/emacs.d")
+       (setq home-dir "~/")))
+
+;; custom-file
+(cond ((string-match-p "\\`PC" (system-name))
+       ;; Emacs SUS
+       (setq custom-file "h:/33-programmer/emacs.d/custom-win.el")
+       (load custom-file))
+      (t
+       ;; Emacs on linux
+       (setq custom-file "~/33-programmer/emacs.d/custom.el")
+       (load custom-file)))
 
 ;; Enable installation of packages via straight.el
 (defvar bootstrap-version)
@@ -33,9 +52,7 @@
 (unless system-type 'windows
         (when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
           (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
-;; custom-file
-(setq custom-file "~/33-programmer/emacs.d/custom.el")
-(load custom-file)
+
 ;; Start server.
 (require 'server)
 (unless (server-running-p)
@@ -48,13 +65,11 @@
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 ;; Theme
-;; (use-package zenburn-theme)
-;; (use-package solarized-theme)
 (load-theme 'modus-vivendi)
 (use-package smart-mode-line
   :init
   (sml/setup))
-;; SHOW stray whitespace.
+;; Show stray whitespace.
 (setq-default show-trailing-whitespace t)
 (setq-default indicate-empty-lines t)
 (setq-default indicate-buffer-boundaries 'left)
@@ -135,19 +150,37 @@
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
 
+;; Fix emacs windows behavior
+(customize-set-variable 'display-buffer-base-action
+  '((display-buffer-reuse-window display-buffer-same-window)
+    (reusable-frames . t)))
+(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
+
+;; Projectile
+(use-package projectile
+  :bind ("C-c p" . projectile-command-map)
+  :init
+  (projectile-mode +1))
+;; Perspectives
+(use-package perspective
+  :bind ("C-x C-b" . persp-ibuffer)
+  :init (persp-mode))
+
 
 ;; yasnippet
 (use-package s)
 (use-package yasnippet
   :after s
   :init
-  (setq yas-snippet-dirs '("~/33-programmer/emacs.d/snippets"))
+  (setq yas-snippet-dirs (list (file-name-concat default-directory "snippets")))
   :custom
   (require warnings)
   (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
   :config
   (yas-global-mode 1))
 
+;; Magit
+(use-package magit)
 
 ;; lsp-mode
 (use-package lsp-treemacs)
@@ -192,7 +225,7 @@
   :straight (:host github :repo "emacs-straight/org-mode"
                    :build (autoloads compile info))
   :init
-  (setq org-directory "~/22-org")
+  (setq org-directory (file-name-concat home-dir "22-org"))
   (setq org-special-ctrl-a/e t)
   (defun org-open-current-frame ()
     "Opens file in current frame."
@@ -203,57 +236,87 @@
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)
          ("C-c <C-return>" . org-open-current-frame)))
-
-;; org-roam
-(use-package dash)
-(use-package f)
-(use-package emacsql)
-(use-package emacsql-sqlite)
+;; Time-stamp
 (require 'time-stamp)
 (add-hook 'write-file-functions 'time-stamp)
 
-(use-package org-roam
-  :after (org)
-  :custom
-  (org-roam-directory (file-truename "~/02-org/org-roam/"))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today))
-  :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  ;;(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol)
+;; org-roam
+(cond ((string-match-p "\\`PC" (system-name))
+       ;; No org-roam at SUS
+       )
+      (t
+       (use-package org-roam
+         :after (org)
+         :custom
+         (org-roam-directory (file-truename "h:/02-org/org-roam/"))
+         :bind (("C-c n l" . org-roam-buffer-toggle)
+                ("C-c n f" . org-roam-node-find)
+                ("C-c n g" . org-roam-graph)
+                ("C-c n i" . org-roam-node-insert)
+                ("C-c n c" . org-roam-capture)
+                ;; Dailies
+                ("C-c n j" . org-roam-dailies-capture-today))
+         :config
+         ;; If you're using a vertical completion framework, you might want a more informative completion interface
+         ;;(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+         (org-roam-db-autosync-mode)
+         ;; If using org-roam-protocol
+         (require 'org-roam-protocol)
 
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?"
-           :target (file+head "${slug}.org"
-                               "#+title: ${title}\n#+date: %U\n#+Time-stamp: \" \"\n")
-           :immediate-finish t
-           :unnarrowed t)
-          ("r" "bibliography reference" plain "%?"
-           :target
-           (file+head "ref/${citekey}.org"
-                      "#+title: ${title}\n#+date: %U\n#+Time-stamp: \" \"\n")
-           :unnarrowed t)))
-  (setq org-roam-dailies-capture-templates
-        '(("d" "default" entry
-           "* %?"
-           :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
-                              "#+title: %<%Y-%m-%d-%H%M>\n#+Time-stamp: \" \"\n")))))
+         (setq org-roam-capture-templates
+               '(("d" "default" plain "%?"
+                  :target (file+head "${slug}.org"
+                                     "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
+                  :immediate-finish t
+                  :unnarrowed t)
+                 ("r" "bibliography reference" plain "%?"
+                  :target
+                  (file+head "ref/${citekey}.org"
+                             "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
+                  :unnarrowed t)))
+         (setq org-roam-dailies-capture-templates
+               '(("d" "default" entry
+                  "* %?"
+                  :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
+                                     "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: \" \"\n"))))))
+      (use-package org-roam-bibtex
+        :after (org-roam helm-bibtex citar)
+        :bind (:map org-mode-map ("C-c n b" . orb-note-actions))
+        :config
+        (org-roam-bibtex-mode))
+      (use-package org-noter)
+
+      ;; PDF-tools
+      (use-package pdf-tools
+        :straight (:host github :repo "vedang/pdf-tools")
+        :config
+        ;; initialise
+        (pdf-tools-install)
+        ;; open pdfs scaled to fit page
+        (setq-default pdf-view-display-size 'fit-page)
+        ;; automatically annotate highlights
+        (setq pdf-annot-activate-created-annotations t)
+        ;; use normal isearch
+        (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+        ;; turn off cua so copy works
+        (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0)))
+        ;; more fine-grained zooming
+        (setq pdf-view-resize-factor 1.1)
+        ;; keyboard shortcuts
+        (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
+        (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
+        (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
+
+      ;; Slime
+      (use-package slime
+        :config (setq inferior-lisp-program "/usr/bin/sbcl")))
 
 ;; bibtex
 (setq bibtex-dialect 'biblatex)
-(setq bibtex-completion-bibliography '("~/02-org/org-jobb/ref/my-library.bib")
+(setq bibtex-completion-bibliography '((file-name-concat home-dir "02-org/org-jobb/ref/my-library.bib"))
       bibtex-completion-pdf-field "File"
-      bibtex-completion-notes-path "~/02-org/org-jobb/ref"
+      bibtex-completion-notes-path (file-name-concat home-dir "02-org/org-jobb/ref/")
       bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-
 	  bibtex-completion-additional-search-fields '(keywords journal)
       bibtex-completion-pdf-symbol "⌘"
       bibtex-completion-notes-symbol "✎"
@@ -268,13 +331,7 @@
 (use-package org-ref
   :after org)
 (use-package citar)
-(use-package org-roam-bibtex
-  :after (org-roam helm-bibtex citar)
-  :bind (:map org-mode-map ("C-c n b" . orb-note-actions))
-  :config
-  (org-roam-bibtex-mode))
 
-(use-package org-noter)
 (use-package org-attach-screenshot
   :after org
   :bind ("C-c s" . org-attach-screenshot)
@@ -289,55 +346,18 @@
   :after org
   :custom (setq org-download-image-dir "~/org/assets/images")
   :bind ("C-c w . org-download-clipboard"))
+
+;; Org reveal
+(use-package ox-reveal
+  :straight (:host github :repo "yjwen/org-reveal")
+  :config (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
+
 ;; Org exporter
-(require 'ox)
-(use-package ox-hugo
-  :after ox
-  :custom
-  (setq org-hugo-base-dir "~/03-hugo")
-  (setq org-hugo-default-section-directory "posts"))
+;; (require 'ox)
+;; (use-package ox-hugo
+;;   :after ox
+;;   :custom
+;;   (setq org-hugo-base-dir "~/03-hugo")
+;;   (setq org-hugo-default-section-directory "posts"))
 ;; Zotxt
 ;;(use-package zotxt)
-
-;; PDF-tools
-(use-package pdf-tools
-  :straight (:host github :repo "vedang/pdf-tools")
-  :config
-  ;; initialise
-  (pdf-tools-install)
-  ;; open pdfs scaled to fit page
-  (setq-default pdf-view-display-size 'fit-page)
-  ;; automatically annotate highlights
-  (setq pdf-annot-activate-created-annotations t)
-  ;; use normal isearch
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-  ;; turn off cua so copy works
-  (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0)))
-  ;; more fine-grained zooming
-  (setq pdf-view-resize-factor 1.1)
-  ;; keyboard shortcuts
-  (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
-  (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
-  (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
-
-;; Magit
-(use-package magit)
-
-;; Slime
-(use-package slime
-  :config (setq inferior-lisp-program "/usr/bin/sbcl"))
-
-;; Projectile
-(use-package projectile
-  :bind ("C-c p" . projectile-command-map)
-  :init
-  (projectile-mode +1))
-;; Perspectives
-(use-package perspective
-  :bind ("C-x C-b" . persp-ibuffer)
-  :init (persp-mode))
-;; Fix emacs windows behavior
-(customize-set-variable 'display-buffer-base-action
-  '((display-buffer-reuse-window display-buffer-same-window)
-    (reusable-frames . t)))
-(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
