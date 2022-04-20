@@ -372,7 +372,7 @@
 ;; Org reveal
 (use-package ox-reveal
   :straight (:host github :repo "yjwen/org-reveal")
-  :config (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
+  :config (setq org-reveal-root (file-name-concat default-directory "reveal.js")))
 
 ;; Org exporter
 ;; (require 'ox)
