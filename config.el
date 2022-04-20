@@ -7,20 +7,13 @@
                                           ("http" . "proxy-ihn.ihelse.net:3128")
 			                              ("https" . "proxy-ihn.ihelse.net:3128")))
        (setq default-directory "h:/33-programmer/emacs.d")
-       (setq home-dir "h:/"))
+       (setq home-dir "h:/")
+       (setq custom-file "h:/33-programmer/emacs.d/custom-win.el"))
       (t
        (setq default-directory "~/33-programmer/emacs.d")
-       (setq home-dir "~/")))
-
-;; custom-file
-(cond ((string-match-p "\\`PC" (system-name))
-       ;; Emacs SUS
-       (setq custom-file "h:/33-programmer/emacs.d/custom-win.el")
-       (load custom-file))
-      (t
-       ;; Emacs on linux
-       (setq custom-file "~/33-programmer/emacs.d/custom.el")
-       (load custom-file)))
+       (setq home-dir "~/")
+       (setq custom-file "~/33-programmer/emacs.d/custom.el")))
+(load custom-file)
 
 ;; Enable installation of packages via straight.el
 (defvar bootstrap-version)
