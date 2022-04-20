@@ -8,11 +8,12 @@
 			                              ("https" . "proxy-ihn.ihelse.net:3128")))
        (setq default-directory "h:/33-programmer/emacs.d")
        (setq home-dir "h:/")
-       (setq custom-file "h:/33-programmer/emacs.d/custom-win.el"))
+       (setq custom-file (file-name-concat default-directory "custom-win.el")))
       (t
        (setq default-directory "~/33-programmer/emacs.d")
        (setq home-dir "~/")
-       (setq custom-file "~/33-programmer/emacs.d/custom.el")))
+       (setq custom-file (file-name-concat default-directory "custom.el"))))
+
 (load custom-file)
 
 ;; Enable installation of packages via straight.el
@@ -33,6 +34,11 @@
 (setq straight-use-package-by-default t)
 (setq use-package-always-demand t)
 
+;; Start server.
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
 ;; Write auto-saves and backups to separate directory.
 (make-directory "~/.tmp/emacs/auto-save/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.tmp/emacs/auto-save/" t)))
@@ -49,13 +55,6 @@
 ;; Language and coding system
 (set-language-environment "UTF-8")
 (setq-default buffer-file-coding-system 'utf-8-unix)
-
-
-;; Start server.
-(require 'server)
-(unless (server-running-p)
-  (server-start))
-
 
 ;; UI
 (column-number-mode)
