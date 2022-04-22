@@ -10,10 +10,11 @@
        (setq home-dir "h:/")
        (setq custom-file (file-name-concat default-directory "custom-win.el")))
       (t
-       (setq default-directory "~/33-programmer/emacs.d")
-       (setq home-dir "~/")
+       (setq default-directory (file-truename "~/33-programmer/emacs.d"))
+       (setq home-dir (file-truename "~/"))
        (setq custom-file (file-name-concat default-directory "custom.el"))))
 
+(setq user-config-file (file-name-concat default-directory "config.el"))
 (load custom-file)
 
 ;; Enable installation of packages via straight.el
@@ -120,13 +121,13 @@
 (add-hook 'Info-mode-hook
           (lambda ()
             (local-set-key (kbd "æ") 'Info-backward-node)
-            (local-set-key (kbd "'") 'Info-forward-node)
-))
+            (local-set-key (kbd "'") 'Info-forward-node)))
 (add-hook 'dired-mode-hook
           (lambda ()
-            (local-set-key (kbd "å") 'dired-up-directory)
-))
-
+            (local-set-key (kbd "å") 'dired-up-directory)))
+(global-set-key (kbd "<f7>") (lambda () (interactive) (find-file user-config-file)))
+;; other hooks
+(add-hook 'text-mode-hook 'auto-fill-mode)
 
 ;; Interactively do things
 (ido-mode t)
@@ -361,29 +362,20 @@
        (use-package org-attach-screenshot
          :after org
          :bind ("C-c s" . org-attach-screenshot)
-         :config (setq org-attach-screenshot-dirfunction
+         :config
+         (setq org-attach-screenshot-dirfunction
                        (lambda ()
                          (progn (cl-assert (buffer-file-name))
-                                (concat (file-name-sans-extension (buffer-file-name))
-                                        "-att")))
-                       org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
-       (use-package org-download
-         :straight (:host github :repo "abo-abo/org-download")
-         :after org
-         :custom (setq org-download-image-dir "~/org/assets/images")
-         :bind ("C-c w" . org-download-clipboard))))
+                                "images"))
+                       org-attach-screenshot-command-line "gnome-screenshot -a -f %f")
+         (setq org-attach-screenshot-relative-links t))))
+       ;; (use-package org-download
+       ;;   :straight (:host github :repo "abo-abo/org-download")
+       ;;   :after org
+       ;;   :custom (setq org-download-image-dir "./images")
+       ;;   :bind ("C-c w" . org-download-clipboard)))
 
 ;; Org reveal
 (use-package ox-reveal
   :straight (:host github :repo "yjwen/org-reveal")
-  :config (setq org-reveal-root (file-name-concat default-directory "reveal.js")))
-
-;; Org exporter
-;; (require 'ox)
-;; (use-package ox-hugo
-;;   :after ox
-;;   :custom
-;;   (setq org-hugo-base-dir "~/03-hugo")
-;;   (setq org-hugo-default-section-directory "posts"))
-;; Zotxt
-;;(use-package zotxt)
+  :config (setq org-reveal-root (file-name-concat "file://" default-directory "reveal.js")))
