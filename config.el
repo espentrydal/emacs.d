@@ -93,7 +93,8 @@
              (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
              (add-hook 'ielm-mode-hook 'enable-paredit-mode)
              (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-             (add-hook 'lisp-mode-hook 'enable-paredit-mode))
+             (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+             (add-hook 'scheme-mode-hook 'enable-paredit-mode))
 ;; Enable Rainbow Delimiters.
 (use-package rainbow-delimiters
              :init
