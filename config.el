@@ -250,77 +250,6 @@
 (require 'time-stamp)
 (add-hook 'write-file-functions 'time-stamp)
 
-;; org-roam
-(cond ((string-match-p "\\`PC" (system-name))
-       ;; No org-roam at SUS
-       )
-      (t
-       (use-package org-roam
-         :after (org)
-         :custom
-         (org-roam-directory (file-truename (file-name-concat home-dir "02-org/org-roam/")))
-         :bind (("C-c n l" . org-roam-buffer-toggle)
-                ("C-c n f" . org-roam-node-find)
-                ("C-c n g" . org-roam-graph)
-                ("C-c n i" . org-roam-node-insert)
-                ("C-c n c" . org-roam-capture)
-                ;; Dailies
-                ("C-c n j" . org-roam-dailies-capture-today))
-         :config
-         ;; If you're using a vertical completion framework, you might want a more informative completion interface
-         ;;(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-         (org-roam-db-autosync-mode)
-         ;; If using org-roam-protocol
-         (require 'org-roam-protocol)
-
-         (setq org-roam-capture-templates
-               '(("d" "default" plain "%?"
-                  :target (file+head "${slug}.org"
-                                     "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
-                  :immediate-finish t
-                  :unnarrowed t)
-                 ("r" "bibliography reference" plain "%?"
-                  :target
-                  (file+head "ref/${citekey}.org"
-                             "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
-                  :unnarrowed t)))
-         (setq org-roam-dailies-capture-templates
-               '(("d" "default" entry
-                  "* %?"
-                  :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
-                                     "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: \" \"\n"))))))
-      (use-package org-roam-bibtex
-        :after (org-roam helm-bibtex citar)
-        :bind (:map org-mode-map ("C-c n b" . orb-note-actions))
-        :config
-        (org-roam-bibtex-mode))
-      (use-package org-noter)
-
-      ;; PDF-tools
-      (use-package pdf-tools
-        :straight (:host github :repo "vedang/pdf-tools")
-        :config
-        ;; initialise
-        (pdf-tools-install)
-        ;; open pdfs scaled to fit page
-        (setq-default pdf-view-display-size 'fit-page)
-        ;; automatically annotate highlights
-        (setq pdf-annot-activate-created-annotations t)
-        ;; use normal isearch
-        (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-        ;; turn off cua so copy works
-        (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0)))
-        ;; more fine-grained zooming
-        (setq pdf-view-resize-factor 1.1)
-        ;; keyboard shortcuts
-        (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
-        (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
-        (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
-
-      ;; Slime
-      (use-package slime
-        :config (setq inferior-lisp-program "/usr/bin/sbcl")))
-
 ;; bibtex
 (setq bibtex-dialect 'biblatex)
 (setq bibtex-completion-bibliography '((file-name-concat home-dir "02-org/org-jobb/ref/my-library.bib"))
@@ -342,40 +271,94 @@
   :after org)
 (use-package citar)
 
-(cond ((string-match-p "\\`PC" (system-name))
-;;        (defun my-org-screenshot ()
-;;          "Take a screenshot into a time stamped unique-named file in the
-;; same directory as the org-buffer and insert a link to this file."
-;;          (interactive)
-;;          (setq filename
-;;                (concat
-;;                 (make-temp-name
-;;                  (concat (buffer-file-name)
-;;                          "_"
-;;                          (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
-;;          (shell-command "snippingtool /clip")
-;;          (shell-command (concat "powershell -command \"Add-Type -AssemblyName System.Windows.Forms;if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {$image = [System.Windows.Forms.Clipboard]::GetImage();[System.Drawing.Bitmap]$image.Save('" filename "',[System.Drawing.Imaging.ImageFormat]::Png); Write-Output 'clipboard content saved as file'} else {Write-Output 'clipboard does not contain image data'}\""))
-;;          (insert (concat "[[file:" filename "]]"))
-;;          (org-display-inline-images))
-       )
-      (t
-       (use-package org-attach-screenshot
-         :after org
-         :bind ("C-c s" . org-attach-screenshot)
-         :config
-         (setq org-attach-screenshot-dirfunction
-                       (lambda ()
-                         (progn (cl-assert (buffer-file-name))
-                                "images"))
-                       org-attach-screenshot-command-line "gnome-screenshot -a -f %f")
-         (setq org-attach-screenshot-relative-links t))))
-       ;; (use-package org-download
-       ;;   :straight (:host github :repo "abo-abo/org-download")
-       ;;   :after org
-       ;;   :custom (setq org-download-image-dir "./images")
-       ;;   :bind ("C-c w" . org-download-clipboard)))
+(unless (eq system-type 'windows-nt)
+  (use-package org-attach-screenshot
+    :after org
+    :bind ("C-c s" . org-attach-screenshot)
+    :config
+    (setq org-attach-screenshot-dirfunction
+          (lambda ()
+            (progn (cl-assert (buffer-file-name))
+                   "images"))
+          org-attach-screenshot-command-line "gnome-screenshot -a -f %f")
+    (setq org-attach-screenshot-relative-links t)))
 
 ;; Org reveal
 (use-package ox-reveal
   :straight (:host github :repo "yjwen/org-reveal")
   :config (setq org-reveal-root (file-name-concat "file://" default-directory "reveal.js")))
+
+
+ ;; org-roam
+(unless (eq system-type 'windows-nt)
+  (use-package org-roam
+    :after (org)
+    :custom
+    (org-roam-directory (file-truename (file-name-concat home-dir "02-org/org-roam/")))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ;; Dailies
+           ("C-c n j" . org-roam-dailies-capture-today))
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    ;;(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-roam-db-autosync-mode)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol)
+
+    (setq org-roam-capture-templates
+          '(("d" "default" plain "%?"
+             :target (file+head "${slug}.org"
+                                "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
+             :immediate-finish t
+             :unnarrowed t)
+            ("r" "bibliography reference" plain "%?"
+             :target
+             (file+head "ref/${citekey}.org"
+                        "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
+             :unnarrowed t)))
+    (setq org-roam-dailies-capture-templates
+          '(("d" "default" entry
+             "* %?"
+             :if-new (file+head "%<%Y-%m-%d-%H%M%S>.org"
+                                "#+title: %<%Y-%m-%d-%H%M>\nTime-stamp: \" \"\n")))))
+  (use-package org-roam-bibtex
+    :after (org-roam helm-bibtex citar)
+    :bind (:map org-mode-map ("C-c n b" . orb-note-actions))
+    :config
+    (org-roam-bibtex-mode))
+  (use-package org-noter)
+
+  ;; PDF-tools
+  (use-package pdf-tools
+    :straight (:host github :repo "vedang/pdf-tools")
+    :config
+    ;; initialise
+    (pdf-tools-install)
+    ;; open pdfs scaled to fit page
+    (setq-default pdf-view-display-size 'fit-page)
+    ;; automatically annotate highlights
+    (setq pdf-annot-activate-created-annotations t)
+    ;; use normal isearch
+    (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+    ;; turn off cua so copy works
+    (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0)))
+    ;; more fine-grained zooming
+    (setq pdf-view-resize-factor 1.1)
+    ;; keyboard shortcuts
+    (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
+    (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
+    (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
+
+  ;; Slime
+  (use-package slime
+    :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (defun override-slime-repl-bindings-with-paredit ()
+      (define-key slime-repl-mode-map
+                  (read-kbd-macro paredit-backward-delete-key) nil))
+    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)))
