@@ -114,6 +114,9 @@
              (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
              (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
              )
+;; Lispy
+(use-package lispy
+  :config (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1))))
 ;; Markup modes
 (use-package markdown-mode)
 
@@ -232,17 +235,18 @@
     (let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
       (org-open-at-point)))
   (setq org-structure-template-alist
-  '(("a" . "export ascii\n")
-    ("c" . "center\n")
-    ("C" . "comment\n")
-    ("e" . "example\n")
-    ("E" . "export")
-    ("h" . "export html\n")
-    ("l" . "export latex\n")
-    ("q" . "quote\n")
-    ("s" . "src")
-    ("v" . "verse\n")
-    ("n" . "notes\n")))
+        '(("a" . "export ascii\n")
+          ("c" . "center\n")
+          ("C" . "comment\n")
+          ("e" . "example\n")
+          ("E" . "export")
+          ("h" . "export html\n")
+          ("l" . "export latex\n")
+          ("p" . "src jupyter-python :session py")
+          ("q" . "quote\n")
+          ("s" . "src")
+          ("v" . "verse\n")
+          ("n" . "notes\n")))
   :bind (("C-c l" . org-store-link)
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)
@@ -362,4 +366,40 @@
     (defun override-slime-repl-bindings-with-paredit ()
       (define-key slime-repl-mode-map
                   (read-kbd-macro paredit-backward-delete-key) nil))
-    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)))
+    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
+
+  ;; Python
+  (use-package conda
+    :config
+    (conda-env-initialize-interactive-shells)
+    (conda-env-initialize-eshell)
+    (conda-env-autoactivate-mode t)
+    (setq conda-env-home-directory (expand-file-name "~/miniconda3/"))
+    (custom-set-variables '(conda-anaconda-home (expand-file-name "~/miniconda3/"))))
+
+  (use-package jupyter
+    :commands
+    (jupyter-run-server-repl
+     jupyter-run-repl
+     jupyter-server-list-kernels)
+    :init
+    (eval-after-load 'jupyter-org-extensions ; conflicts with my helm config, I use <f2 #>
+      '(unbind-key "C-c h" jupyter-org-interaction-mode-map))
+    :config
+    (defun my/jupyter-refresh-kernelspecs ()
+      "Refresh Jupyter kernelspecs"
+      (interactive)
+      (jupyter-available-kernelspecs t)))
+
+  (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
+                                                    (:session . "py")
+                                                    (:kernel . "python3")))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (latex . t)
+     (C . t)
+     (makefile . t)
+     (python . t)
+     (jupyter . t))))
