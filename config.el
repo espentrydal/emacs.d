@@ -211,16 +211,17 @@
   (which-key-mode)
   (add-hook 'c-mode-hook 'lsp)
   (add-hook 'c++-mode-hook 'lsp)
+  (add-hook 'python-mode-hook 'lsp)
   (setq gc-cons-threshold (* 100 1024 1024)
         read-process-output-max (* 1024 1024)
         treemacs-space-between-root-nodes nil
         company-idle-delay 0.0
         company-minimum-prefix-length 1
-        lsp-idle-delay 0.1)  ;; clangd is fast
+        lsp-idle-delay 0.1) ;; clangd is fast
   :config
   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
   (require 'dap-cpptools)
-)
+  (setq lsp-pylsp-plugins-flake8-ignore ["D100"]))
 
 ;; Org
 (use-package org
@@ -228,7 +229,7 @@
                    :build (autoloads compile info))
   :init
   (setq org-directory (file-name-concat home-dir "22-org"))
-  (setq org-special-ctrl-a/e t)
+  (setq org-special-ctrl-a/e 'reversed)
   (defun org-open-current-frame ()
     "Opens file in current frame."
     (interactive)
@@ -293,8 +294,16 @@
   :straight (:host github :repo "yjwen/org-reveal")
   :config (setq org-reveal-root (file-name-concat "file://" default-directory "reveal.js")))
 
+;; epub
+(use-package nov
+  :init
+  (setq nov-variable-pitch t)
+  (defun my-nov-font-setup ()
+    (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
+                             :height 1.0))
+  (add-hook 'nov-mode-hook 'my-nov-font-setup))
 
- ;; org-roam
+;; org-roam
 (unless (eq system-type 'windows-nt)
   (use-package org-roam
     :after (org)
@@ -391,9 +400,10 @@
       (interactive)
       (jupyter-available-kernelspecs t)))
 
+  (setq org-confirm-babel-evaluate nil)
   (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
-                                                    (:session . "py")
-                                                    (:kernel . "python3")))
+                                                       (:session . "py")
+                                                       (:kernel . "python3")))
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
