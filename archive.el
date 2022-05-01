@@ -46,3 +46,12 @@
 ;;          (shell-command (concat "powershell -command \"Add-Type -AssemblyName System.Windows.Forms;if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {$image = [System.Windows.Forms.Clipboard]::GetImage();[System.Drawing.Bitmap]$image.Save('" filename "',[System.Drawing.Imaging.ImageFormat]::Png); Write-Output 'clipboard content saved as file'} else {Write-Output 'clipboard does not contain image data'}\""))
 ;;          (insert (concat "[[file:" filename "]]"))
 ;;          (org-display-inline-images))
+
+;; Change font
+(defun my/variable-font-setup () (interactive)
+    (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
+                             :height 1.0))
+
+;; Lispy
+(use-package lispy
+  :config (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1))))

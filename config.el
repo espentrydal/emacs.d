@@ -86,15 +86,16 @@
 ;; Highlight matching pairs of parentheses.
 (setq show-paren-delay 0)
 (show-paren-mode)
+
 ;; Enable Paredit.
 (use-package paredit
-             :init
-             (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-             (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
-             (add-hook 'ielm-mode-hook 'enable-paredit-mode)
-             (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-             (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-             (add-hook 'scheme-mode-hook 'enable-paredit-mode))
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook 'enable-paredit-mode))
 ;; Enable Rainbow Delimiters.
 (use-package rainbow-delimiters
              :init
@@ -114,11 +115,90 @@
              (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
              (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
              )
-;; Lispy
-(use-package lispy
-  :config (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1))))
+
 ;; Markup modes
 (use-package markdown-mode)
+
+(use-package fontaine
+  :straight (:host github :repo "protesilaos/fontaine")
+  :init
+  (setq fontaine-presets
+        '((small
+           :default-family "Hack"
+           :default-weight normal
+           :default-height 100
+           :fixed-pitch-family nil     ; falls back to :default-family
+           :fixed-pitch-weight nil     ; falls back to :default-weight
+           :fixed-pitch-height 1.0
+           :variable-pitch-family "Noto Sans"
+           :variable-pitch-weight normal
+           :variable-pitch-height 1.0
+           :bold-family nil     ; use whatever the underlying face has
+           :bold-weight bold
+           :italic-family nil
+           :italic-slant italic
+           :line-spacing nil)
+          (regular
+           :default-family "Iosevka Comfy"
+           :default-weight normal
+           :default-height 150
+           :fixed-pitch-family nil     ; falls back to :default-family
+           :fixed-pitch-weight nil     ; falls back to :default-weight
+           :fixed-pitch-height 1.0
+           :variable-pitch-family "FiraGO"
+           :variable-pitch-weight normal
+           :variable-pitch-height 1.05
+           :bold-family nil     ; use whatever the underlying face has
+           :bold-weight bold
+           :italic-family nil
+           :italic-slant italic
+           :line-spacing nil)
+          (medium
+           :default-family "Source Code Pro"
+           :default-weight normal
+           :default-height 150
+           :fixed-pitch-family nil     ; falls back to :default-family
+           :fixed-pitch-weight nil     ; falls back to :default-weight
+           :fixed-pitch-height 1.0
+           :variable-pitch-family "Source Sans Pro"
+           :variable-pitch-weight normal
+           :variable-pitch-height 1.05
+           :bold-family nil     ; use whatever the underlying face has
+           :bold-weight semibold
+           :italic-family nil
+           :italic-slant italic
+           :line-spacing nil)
+          (large
+           :default-family "Iosevka Comfy"
+           :default-weight semilight
+           :default-height 180
+           :fixed-pitch-family nil     ; falls back to :default-family
+           :fixed-pitch-weight nil     ; falls back to :default-weight
+           :fixed-pitch-height 1.0
+           :variable-pitch-family "FiraGO"
+           :variable-pitch-weight normal
+           :variable-pitch-height 1.05
+           :bold-family nil     ; use whatever the underlying face has
+           :bold-weight bold
+           :italic-family nil
+           :italic-slant italic
+           :line-spacing nil)
+          (presentation
+           :default-family "Iosevka Comfy"
+           :default-weight semilight
+           :default-height 180
+           :fixed-pitch-family nil     ; falls back to :default-family
+           :fixed-pitch-weight nil     ; falls back to :default-weight
+           :fixed-pitch-height 1.0
+           :variable-pitch-family "FiraGO"
+           :variable-pitch-weight normal
+           :variable-pitch-height 1.05
+           :bold-family nil     ; use whatever the underlying face has
+           :bold-weight bold
+           :italic-family nil
+           :italic-slant italic
+           :line-spacing nil)))
+  :config (fontaine-set-preset 'regular))
 
 ;; Custom key sequences.
 (global-set-key (kbd "C-c d") 'delete-trailing-whitespace)
@@ -132,6 +212,7 @@
 (global-set-key (kbd "<f7>") (lambda () (interactive) (find-file user-config-file)))
 ;; other hooks
 (add-hook 'text-mode-hook 'auto-fill-mode)
+(add-hook 'Info-mode-hook (progn (lambda () (variable-pitch-mode t))))
 
 ;; Interactively do things
 (ido-mode t)
@@ -144,6 +225,9 @@
 ;; Helm
 (use-package helm)
 (use-package helm-xref)
+;; Find things
+(setq apropos-sort-by-scores t)
+
 ;; Winner mode
 (winner-mode 1)
 ;; (define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
@@ -159,14 +243,18 @@
 (customize-set-variable 'even-window-sizes nil)     ; avoid resizing
 
 ;; Projectile
-(use-package projectile
-  :bind ("C-c p" . projectile-command-map)
-  :init
-  (projectile-mode +1))
+;; (use-package projectile
+;;   :bind ("C-c p" . projectile-command-map)
+;;   :init
+;;   (projectile-mode +1))
 ;; Perspectives
 (use-package perspective
   :bind ("C-x C-b" . persp-ibuffer)
-  :init (persp-mode))
+  :custom
+  (persp-mode-prefix-key (kbd "C-z"))
+  (setq persp-state-default-file (file-name-concat home-dir ".emacs.d/persp"))
+  :init (persp-mode)
+  :config (add-hook 'kill-emacs-hook #'persp-state-save))
 
 
 ;; yasnippet
@@ -297,11 +385,7 @@
 ;; epub
 (use-package nov
   :init
-  (setq nov-variable-pitch t)
-  (defun my-nov-font-setup ()
-    (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
-                             :height 1.0))
-  (add-hook 'nov-mode-hook 'my-nov-font-setup))
+  (setq nov-variable-pitch t))
 
 ;; org-roam
 (unless (eq system-type 'windows-nt)
@@ -375,41 +459,41 @@
     (defun override-slime-repl-bindings-with-paredit ()
       (define-key slime-repl-mode-map
                   (read-kbd-macro paredit-backward-delete-key) nil))
-    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
+    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)))
 
   ;; Python
-  (use-package conda
-    :config
-    (conda-env-initialize-interactive-shells)
-    (conda-env-initialize-eshell)
-    (conda-env-autoactivate-mode t)
-    (setq conda-env-home-directory (expand-file-name "~/miniconda3/"))
-    (custom-set-variables '(conda-anaconda-home (expand-file-name "~/miniconda3/"))))
+  ;; (use-package conda
+  ;;   :config
+  ;;   (conda-env-initialize-interactive-shells)
+  ;;   (conda-env-initialize-eshell)
+  ;;   (conda-env-autoactivate-mode nil)
+  ;;   (setq conda-env-home-directory (expand-file-name "~/miniconda3/"))
+  ;;   (custom-set-variables '(conda-anaconda-home (expand-file-name "~/miniconda3/"))))
 
-  (use-package jupyter
-    :commands
-    (jupyter-run-server-repl
-     jupyter-run-repl
-     jupyter-server-list-kernels)
-    :init
-    (eval-after-load 'jupyter-org-extensions ; conflicts with my helm config, I use <f2 #>
-      '(unbind-key "C-c h" jupyter-org-interaction-mode-map))
-    :config
-    (defun my/jupyter-refresh-kernelspecs ()
-      "Refresh Jupyter kernelspecs"
-      (interactive)
-      (jupyter-available-kernelspecs t)))
+  ;; (use-package jupyter
+  ;;   :commands
+  ;;   (jupyter-run-server-repl
+  ;;    jupyter-run-repl
+  ;;    jupyter-server-list-kernels)
+  ;;   :init
+  ;;   (eval-after-load 'jupyter-org-extensions ; conflicts with my helm config, I use <f2 #>
+  ;;     '(unbind-key "C-c h" jupyter-org-interaction-mode-map))
+  ;;   :config
+  ;;   (defun my/jupyter-refresh-kernelspecs ()
+  ;;     "Refresh Jupyter kernelspecs"
+  ;;     (interactive)
+  ;;     (jupyter-available-kernelspecs t)))
 
-  (setq org-confirm-babel-evaluate nil)
-  (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
-                                                       (:session . "py")
-                                                       (:kernel . "python3")))
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (shell . t)
-     (latex . t)
-     (C . t)
-     (makefile . t)
-     (python . t)
-     (jupyter . t))))
+  ;; (setq org-confirm-babel-evaluate nil)
+  ;; (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
+  ;;                                                      (:session . "py")
+  ;;                                                      (:kernel . "python3")))
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '((emacs-lisp . t)
+  ;;    (shell . t)
+  ;;    (latex . t)
+  ;;    (C . t)
+  ;;    (makefile . t)
+  ;;    (python . t)
+  ;;    (jupyter . t))))
