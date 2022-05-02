@@ -1,13 +1,15 @@
 ;; init.el
 (cond ((string-match-p "\\`PC" (system-name))
-       ;; Emacs SUS
+       ;; SUS
        (let ((default-directory "h:/33-programmer/emacs.d"))
-         (add-to-list 'load-path default-directory))
-       (require 'config))
+         (add-to-list 'load-path default-directory)))
+      ((eq 'windows-nt system-type)
+       ;; Windows
+       (let ((default-directory "c:/33-programmer/emacs.d"))
+         (add-to-list 'load-path default-directory)))
       (t
-       ;; Emacs on linux
+       ;; Linux og annet
        (let ((default-directory "~/33-programmer/emacs.d"))
-         (add-to-list 'load-path default-directory))
-       (require 'config)))
+         (add-to-list 'load-path default-directory))))
 
-
+(require 'config)

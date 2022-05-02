@@ -1,15 +1,21 @@
 ;; config.el
 (provide 'config)
 
-;; SUS vs linux hjemme (TODO: windows hjemme)
 (cond ((string-match-p "\\`PC" (system-name))
+       ;; SUS
        (setq-default url-proxy-services '(("no_proxy" . "sus\\.no")
                                           ("http" . "proxy-ihn.ihelse.net:3128")
 			                              ("https" . "proxy-ihn.ihelse.net:3128")))
        (setq default-directory "h:/33-programmer/emacs.d")
        (setq home-dir "h:/")
        (setq custom-file (file-name-concat default-directory "custom-win.el")))
+      ((eq 'windows-nt system-type)
+       ;; Windows
+       (setq default-directory "c:/33-programmer/emacs.d")
+       (setq home-dir "c:/")
+       (setq custom-file (file-name-concat default-directory "custom-win.el")))
       (t
+       ;; Annet
        (setq default-directory (file-truename "~/33-programmer/emacs.d"))
        (setq home-dir (file-truename "~/"))
        (setq custom-file (file-name-concat default-directory "custom.el"))))
@@ -43,7 +49,7 @@
 ;; Write auto-saves and backups to separate directory.
 (make-directory "~/.tmp/emacs/auto-save/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.tmp/emacs/auto-save/" t)))
-(setq backup-directory-alist '(("." . "~/.tmp/emacs/backup/")))
+(setq backup-directory-alist '(("." . ".tmp/emacs/backup/")))
 ;; Do not move the current file while creating backup.
 (setq backup-by-copying t)
 ;; Disable lockfiles.
@@ -98,23 +104,23 @@
   (add-hook 'scheme-mode-hook 'enable-paredit-mode))
 ;; Enable Rainbow Delimiters.
 (use-package rainbow-delimiters
-             :init
-             (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
-             (add-hook 'ielm-mode-hook 'rainbow-delimiters-mode)
-             (add-hook 'lisp-interaction-mode-hook 'rainbow-delimiters-mode)
-             (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'ielm-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'lisp-interaction-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
 
-             :config
-             (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")  ; red
-             (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")  ; green
-             (set-face-foreground 'rainbow-delimiters-depth-3-face "#69f")  ; blue
-             (set-face-foreground 'rainbow-delimiters-depth-4-face "#cc6")  ; yellow
-             (set-face-foreground 'rainbow-delimiters-depth-5-face "#6cc")  ; cyan
-             (set-face-foreground 'rainbow-delimiters-depth-6-face "#c6c")  ; magenta
-             (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
-             (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
-             (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
-             )
+  :config
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")  ; red
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")  ; green
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#69f")  ; blue
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#cc6")  ; yellow
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#6cc")  ; cyan
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#c6c")  ; magenta
+  (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
+  (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
+  (set-face-foreground 'rainbow-delimiters-depth-9-face "#667")  ; dark gray
+  )
 
 ;; Markup modes
 (use-package markdown-mode)
@@ -122,82 +128,100 @@
 (use-package fontaine
   :straight (:host github :repo "protesilaos/fontaine")
   :init
-  (setq fontaine-presets
-        '((small
-           :default-family "Hack"
-           :default-weight normal
-           :default-height 100
-           :fixed-pitch-family nil     ; falls back to :default-family
-           :fixed-pitch-weight nil     ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :variable-pitch-family "Noto Sans"
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.0
-           :bold-family nil     ; use whatever the underlying face has
-           :bold-weight bold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil)
-          (regular
-           :default-family "Iosevka Comfy"
-           :default-weight normal
-           :default-height 150
-           :fixed-pitch-family nil     ; falls back to :default-family
-           :fixed-pitch-weight nil     ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :variable-pitch-family "FiraGO"
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.05
-           :bold-family nil     ; use whatever the underlying face has
-           :bold-weight bold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil)
-          (medium
-           :default-family "Source Code Pro"
-           :default-weight normal
-           :default-height 150
-           :fixed-pitch-family nil     ; falls back to :default-family
-           :fixed-pitch-weight nil     ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :variable-pitch-family "Source Sans Pro"
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.05
-           :bold-family nil     ; use whatever the underlying face has
-           :bold-weight semibold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil)
-          (large
-           :default-family "Iosevka Comfy"
-           :default-weight semilight
-           :default-height 180
-           :fixed-pitch-family nil     ; falls back to :default-family
-           :fixed-pitch-weight nil     ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :variable-pitch-family "FiraGO"
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.05
-           :bold-family nil     ; use whatever the underlying face has
-           :bold-weight bold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil)
-          (presentation
-           :default-family "Iosevka Comfy"
-           :default-weight semilight
-           :default-height 180
-           :fixed-pitch-family nil     ; falls back to :default-family
-           :fixed-pitch-weight nil     ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :variable-pitch-family "FiraGO"
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.05
-           :bold-family nil     ; use whatever the underlying face has
-           :bold-weight bold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil)))
+  (cond ((string-match-p "pop-os" (system-name))
+         (setq fontaine-presets
+               '((small
+                  :default-family "Hack"
+                  :default-weight normal
+                  :default-height 100
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "Noto Sans"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.0
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight bold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil)
+                 (regular
+                  :default-family "Iosevka Comfy"
+                  :default-weight normal
+                  :default-height 150
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "FiraGO"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.05
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight bold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil)
+                 (medium
+                  :default-family "Source Code Pro"
+                  :default-weight normal
+                  :default-height 150
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "Source Sans Pro"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.05
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight semibold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil)
+                 (large
+                  :default-family "Iosevka Comfy"
+                  :default-weight semilight
+                  :default-height 180
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "FiraGO"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.05
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight bold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil)
+                 (presentation
+                  :default-family "Iosevka Comfy"
+                  :default-weight semilight
+                  :default-height 180
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "FiraGO"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.05
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight bold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil))))
+        ((eq 'windows-nt system-type)
+         (setq fontaine-presets
+               '((regular
+                  :default-family "Consolas"
+                  :default-weight normal
+                  :default-height 150
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "Arial"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.05
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight bold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil)))))
   :config (fontaine-set-preset 'regular))
 
 ;; Custom key sequences.
@@ -252,7 +276,7 @@
   :bind ("C-x C-b" . persp-ibuffer)
   :custom
   (persp-mode-prefix-key (kbd "C-z"))
-  (setq persp-state-default-file (file-name-concat home-dir ".emacs.d/persp"))
+  (setq persp-state-default-file (file-name-concat user-emacs-directory "persp"))
   :init (persp-mode)
   :config (add-hook 'kill-emacs-hook #'persp-state-save))
 
@@ -388,7 +412,7 @@
   (setq nov-variable-pitch t))
 
 ;; org-roam
-(unless (eq system-type 'windows-nt)
+(unless (string-match-p "\\`PC" (system-name))
   (use-package org-roam
     :after (org)
     :custom
@@ -455,7 +479,8 @@
   (use-package slime
     :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
     :config
-    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (cond ((file-exists-p "/usr/bin/sbcl"))
+          (setq inferior-lisp-program "/usr/bin/sbcl"))
     (defun override-slime-repl-bindings-with-paredit ()
       (define-key slime-repl-mode-map
                   (read-kbd-macro paredit-backward-delete-key) nil))
