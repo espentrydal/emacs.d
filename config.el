@@ -276,7 +276,7 @@
   :bind ("C-x C-b" . persp-ibuffer)
   :custom
   (persp-mode-prefix-key (kbd "C-z"))
-  (setq persp-state-default-file (file-name-concat user-emacs-directory "persp"))
+  (persp-state-default-file (file-name-concat user-emacs-directory "persp-exit"))
   :init (persp-mode)
   :config (add-hook 'kill-emacs-hook #'persp-state-save))
 
