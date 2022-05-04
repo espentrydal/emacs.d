@@ -210,7 +210,7 @@
                '((regular
                   :default-family "Consolas"
                   :default-weight normal
-                  :default-height 150
+                  :default-height 135
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -279,7 +279,6 @@
   (persp-state-default-file (file-name-concat user-emacs-directory "persp-exit"))
   :init (persp-mode)
   :config (add-hook 'kill-emacs-hook #'persp-state-save))
-
 
 ;; yasnippet
 (use-package s)
@@ -479,11 +478,19 @@
   (use-package slime
     :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
     :config
-    (cond ((file-exists-p "/usr/bin/sbcl"))
-          (setq inferior-lisp-program "/usr/bin/sbcl"))
+    (cond ((progn (setq sbcl "/usr/bin/sbcl")
+                  (file-exists-p sbcl))
+           (setq inferior-lisp-program sbcl))
+          ((progn
+             (setq sbcl
+                   "C:/Program\ Files/Steel\ Bank\ Common\ Lisp/sbcl.exe")
+             (file-exists-p sbcl))
+           (setq inferior-lisp-program sbcl)))
+
+
     (defun override-slime-repl-bindings-with-paredit ()
       (define-key slime-repl-mode-map
-                  (read-kbd-macro paredit-backward-delete-key) nil))
+        (read-kbd-macro paredit-backward-delete-key) nil))
     (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)))
 
   ;; Python
