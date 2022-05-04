@@ -93,15 +93,25 @@
 (setq show-paren-delay 0)
 (show-paren-mode)
 
-;; Enable Paredit.
-(use-package paredit
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
-  (add-hook 'ielm-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'scheme-mode-hook 'enable-paredit-mode))
+;; ;; Enable Paredit.
+;; (use-package paredit
+;;   :init
+;;   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+;;   (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
+;;   (add-hook 'ielm-mode-hook 'enable-paredit-mode)
+;;   (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
+;;   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+;;   (add-hook 'scheme-mode-hook 'enable-paredit-mode))
+
+;; Smartparens
+(use-package smartparens
+    :init
+  (add-hook 'emacs-lisp-mode-hook 'smartparens-strict-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook 'enable-smartparens-strict-mode)
+  (add-hook 'ielm-mode-hook 'smartparens-strict-mode)
+  (add-hook 'lisp-interaction-mode-hook 'smartparens-strict-mode)
+  (add-hook 'lisp-mode-hook 'smartparens-strict-mode)
+  (add-hook 'scheme-mode-hook 'smartparens-strict-mode))
 ;; Enable Rainbow Delimiters.
 (use-package rainbow-delimiters
   :init
@@ -412,6 +422,7 @@
 
 ;; org-roam
 (unless (string-match-p "\\`PC" (system-name))
+  ;; Not at SUS
   (use-package org-roam
     :after (org)
     :custom
@@ -491,7 +502,19 @@
     (defun override-slime-repl-bindings-with-paredit ()
       (define-key slime-repl-mode-map
         (read-kbd-macro paredit-backward-delete-key) nil))
-    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)))
+    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
+
+  ;; Clojure
+  (use-package clojure-mode
+    :init
+    (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
+    (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+    (add-hook 'clojure-mode-hook #'subword-mode))
+  (use-package cider
+    :init
+    (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
+    (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+    (add-hook 'cider-repl-mode-hook #'subword-mode)))
 
   ;; Python
   ;; (use-package conda
