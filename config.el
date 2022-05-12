@@ -201,7 +201,7 @@
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
-                  :variable-pitch-family "Arial"
+                  :variable-pitch-family "Georgia"
                   :variable-pitch-weight normal
                   :variable-pitch-height 1.05
                   :bold-family nil ; use whatever the underlying face has
