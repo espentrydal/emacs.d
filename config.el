@@ -208,8 +208,25 @@
                   :bold-weight bold
                   :italic-family nil
                   :italic-slant italic
-                  :line-spacing nil)))))
-  :config (fontaine-set-preset 'regular))
+                  :line-spacing nil))))
+        ((eq 'gnu/linux system-type)
+         (setq fontaine-presets
+               '((regular
+                  :default-family "Source Code Pro"
+                  :default-weight normal
+                  :default-height 135
+                  :fixed-pitch-family nil ; falls back to :default-family
+                  :fixed-pitch-weight nil ; falls back to :default-weight
+                  :fixed-pitch-height 1.0
+                  :variable-pitch-family "Source Sans Pro"
+                  :variable-pitch-weight normal
+                  :variable-pitch-height 1.05
+                  :bold-family nil ; use whatever the underlying face has
+                  :bold-weight bold
+                  :italic-family nil
+                  :italic-slant italic
+                  :line-spacing nil))))
+        :config (fontaine-set-preset 'regular)))
 
 ;; Custom key sequences.
 (global-set-key (kbd "C-c d") 'delete-trailing-whitespace)
@@ -390,8 +407,8 @@
   (setq nov-variable-pitch t))
 
 ;; org-roam
-(unless (string-match-p "\\`PC" (system-name))
-  ;; Not at SUS
+(unless (and (eq system-type 'windows-nt) (string-match-p "\\`PC" (system-name)))
+  ;; Not Windows PC at SUS
   (use-package org-roam
     :after (org)
     :custom
@@ -452,27 +469,28 @@
     ;; keyboard shortcuts
     (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
     (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
-    (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
+    (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete)))
 
   ;; Slime
-  (use-package slime
-    :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
-    :config
-    (cond ((progn (setq sbcl "/usr/bin/sbcl")
-                  (file-exists-p sbcl))
-           (load (expand-file-name "~/quicklisp/slime-helper.el"))
-           (setq inferior-lisp-program sbcl))
-          ((progn
-             (setq sbcl
-                   "C:/Program\ Files/Steel\ Bank\ Common\ Lisp/sbcl.exe")
-             (file-exists-p sbcl))
-           (setq inferior-lisp-program sbcl)))
+(use-package slime
+  :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+  :config
+  (cond ((progn (setq sbcl "/usr/bin/sbcl")
+                (file-exists-p sbcl)))
+        (setq inferior-lisp-program sbcl)
+        ((progn
+           (setq sbcl
+                 "C:/Program\ Files/Steel\ Bank\ Common\ Lisp/sbcl.exe")
+           (file-exists-p sbcl))
+         (setq inferior-lisp-program sbcl)))
+  (if (progn (setq slime-helper (expand-file-name "~/quicklisp/slime-helper.el"))
+             (file-exists-p slime-helper))
+      (load slime-helper))
 
-
-    (defun override-slime-repl-bindings-with-paredit ()
-      (define-key slime-repl-mode-map
-        (read-kbd-macro paredit-backward-delete-key) nil))
-    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
+  (defun override-slime-repl-bindings-with-paredit ()
+    (define-key slime-repl-mode-map
+      (read-kbd-macro paredit-backward-delete-key) nil))
+  (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
 
   ;; Clojure
   (use-package clojure-mode
@@ -484,7 +502,7 @@
     :init
     (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
     (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-    (add-hook 'cider-repl-mode-hook #'subword-mode)))
+    (add-hook 'cider-repl-mode-hook #'subword-mode))
 
   ;; Python
   ;; (use-package conda
