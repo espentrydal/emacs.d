@@ -569,20 +569,6 @@
     (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete)))
 
   ;; Slime
-<<<<<<< HEAD
-  (use-package slime
-    :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
-    :config
-    (cond ((progn (setq sbcl "~/.guix-profile/bin/sbcl")
-                  (file-exists-p sbcl))
-           (load (expand-file-name "~/quicklisp/slime-helper.el"))
-           (setq inferior-lisp-program sbcl))
-          ((progn
-             (setq sbcl
-                   "C:/Program\ Files/Steel\ Bank\ Common\ Lisp/sbcl.exe")
-             (file-exists-p sbcl))
-           (setq inferior-lisp-program sbcl)))
-=======
 (use-package slime
   :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
   :config
@@ -597,7 +583,6 @@
   (if (progn (setq slime-helper (expand-file-name "~/quicklisp/slime-helper.el"))
              (file-exists-p slime-helper))
       (load slime-helper))
->>>>>>> 4e6aa364839eb98df2333d337b241ef6a84a7eac
 
   (defun override-slime-repl-bindings-with-paredit ()
     (define-key slime-repl-mode-map
