@@ -65,7 +65,7 @@
 
 ;; UI
 (column-number-mode)
-(menu-bar-mode -1)
+(menu-bar-mode 1)
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 ;; Theme
@@ -183,7 +183,8 @@
   ;(setq exwm-workspace-minibuffer-position 'bottom)
   :config
   (if (eq system-type 'gnu/linux)
-      (exwm-enable)))
+      ((tool-bar-mode 1)
+       (exwm-enable))))
 
 
 ;; Highlight matching pairs of parentheses.
@@ -322,8 +323,8 @@
                   :bold-weight bold
                   :italic-family nil
                   :italic-slant italic
-                  :line-spacing nil))))
-        :config (fontaine-set-preset 'regular)))
+                  :line-spacing nil)))))
+        :config (fontaine-set-preset 'regular))
 
 ;; Custom key sequences.
 (global-set-key (kbd "C-c d") 'delete-trailing-whitespace)
@@ -566,28 +567,29 @@
     ;; keyboard shortcuts
     (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
     (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
-    (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete)))
+    (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
 
   ;; Slime
-(use-package slime
-  :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
-  :config
-  (cond ((progn (setq sbcl "/usr/bin/sbcl")
-                (file-exists-p sbcl)))
-        (setq inferior-lisp-program sbcl)
-        ((progn
-           (setq sbcl
-                 "C:/Program\ Files/Steel\ Bank\ Common\ Lisp/sbcl.exe")
-           (file-exists-p sbcl))
-         (setq inferior-lisp-program sbcl)))
-  (if (progn (setq slime-helper (expand-file-name "~/quicklisp/slime-helper.el"))
-             (file-exists-p slime-helper))
-      (load slime-helper))
+  (use-package slime
+    :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+    :config
+    (cond ((progn (setq sbcl "/usr/bin/sbcl")
+                  (file-exists-p sbcl))
+           (setq inferior-lisp-program sbcl))
+          ((progn
+             (setq sbcl
+                   "C:/Program\ Files/Steel\ Bank\ Common\ Lisp/sbcl.exe")
+             (file-exists-p sbcl))
+           (setq inferior-lisp-program sbcl))
+          (t))
+    (if (progn (setq slime-helper (expand-file-name "~/quicklisp/slime-helper.el"))
+               (file-exists-p slime-helper))
+        (load slime-helper))
 
-  (defun override-slime-repl-bindings-with-paredit ()
-    (define-key slime-repl-mode-map
-      (read-kbd-macro paredit-backward-delete-key) nil))
-  (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
+    (defun override-slime-repl-bindings-with-paredit ()
+      (define-key slime-repl-mode-map
+        (read-kbd-macro paredit-backward-delete-key) nil))
+    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit))
 
   ;; Clojure
   (use-package clojure-mode
@@ -599,7 +601,7 @@
     :init
     (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
     (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-    (add-hook 'cider-repl-mode-hook #'subword-mode))
+    (add-hook 'cider-repl-mode-hook #'subword-mode)))
 
   ;; Python
   ;; (use-package conda
