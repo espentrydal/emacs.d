@@ -98,6 +98,7 @@
        ;; Fix problems with Ido (if you use it).
        (require 'exwm-config)
        (exwm-config-ido)
+       (setq-default exwm-replace nil)
 
        ;; Set the initial number of workspaces (they can also be created later).
        (setq exwm-workspace-number 4)
@@ -184,7 +185,7 @@
   ;; uncommenting the following line.
   ;(setq exwm-workspace-minibuffer-position 'bottom)
   :config
-  (tool-bar-mode -1)
+  (menu-bar-mode -1)
   (exwm-enable)
   (add-hook 'exwm-init-hook #'exwm-modeline-mode)))
 
