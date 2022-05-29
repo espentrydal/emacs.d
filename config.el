@@ -78,6 +78,10 @@
 (setq-default show-trailing-whitespace t)
 (setq-default indicate-empty-lines t)
 (setq-default indicate-buffer-boundaries 'left)
+(add-hook 'term-mode-hook
+          (lambda ()
+            (setq show-trailing-whitespace nil)
+            (setq indicate-empty-lines nil)))
 ;; Consider a period followed by a single space to be end of sentence.
 (setq-default sentence-end-double-space nil)
 ;; Use spaces, not tabs, for indentation.
