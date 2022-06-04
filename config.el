@@ -245,6 +245,7 @@
           (lambda ()
             (local-set-key (kbd "å") 'dired-up-directory)))
 (global-set-key (kbd "<f7>") (lambda () (interactive) (find-file user-config-file)))
+(global-set-key (kbd "C-c C-i") 'ace-swap-window)
 ;; other hooks
 (add-hook 'text-mode-hook 'auto-fill-mode)
 (add-hook 'Info-mode-hook (progn (lambda () (variable-pitch-mode t))))
