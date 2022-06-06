@@ -141,7 +141,7 @@
                  (regular
                   :default-family "Iosevka Comfy"
                   :default-weight normal
-                  :default-height 150
+                  :default-height 140
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -156,7 +156,7 @@
                  (medium
                   :default-family "Source Code Pro"
                   :default-weight normal
-                  :default-height 150
+                  :default-height 140
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -171,7 +171,7 @@
                  (large
                   :default-family "Iosevka Comfy"
                   :default-weight semilight
-                  :default-height 180
+                  :default-height 160
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
