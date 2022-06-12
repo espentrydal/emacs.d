@@ -70,7 +70,14 @@
 (scroll-bar-mode -1)
 (setq inhibit-startup-screen t)
 ;; Theme
-(load-theme 'modus-vivendi)
+(use-package circadian
+  :config
+  (setq calendar-latitude 58.969975)
+  (setq calendar-longitude 5.733107)
+  (setq circadian-themes '((:sunrise . modus-operandi)
+                           (:sunset  . modus-vivendi)))
+  (circadian-setup))
+
 (use-package smart-mode-line
   :init
   (sml/setup))
@@ -141,7 +148,7 @@
                  (regular
                   :default-family "Iosevka Comfy"
                   :default-weight normal
-                  :default-height 140
+                  :default-height 145
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -156,7 +163,7 @@
                  (medium
                   :default-family "Source Code Pro"
                   :default-weight normal
-                  :default-height 140
+                  :default-height 145
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -287,7 +294,7 @@
 (use-package perspective
   :bind ("C-x C-b" . persp-ibuffer)
   :custom
-  (persp-mode-prefix-key (kbd "C-z"))
+  (persp-mode-prefix-key (kbd "C-t"))
   (persp-state-default-file (file-name-concat user-emacs-directory "persp-exit"))
   :init (persp-mode)
   :config (add-hook 'kill-emacs-hook #'persp-state-save))
