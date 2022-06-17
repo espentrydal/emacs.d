@@ -445,7 +445,7 @@
     (setq org-roam-capture-templates
           '(("d" "default" plain "%?"
              :target (file+head "${slug}.org"
-                                "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
+                                "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
              :immediate-finish t
              :unnarrowed t)
             ("r" "bibliography reference" plain "%?"
@@ -485,7 +485,7 @@
     (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
     (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
     (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
-
+ 
   ;; Slime
   (use-package slime
     :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
