@@ -16,7 +16,7 @@
        (setq custom-file (file-name-concat default-directory "custom-win.el")))
       (t
        ;; Annet
-       (setq default-directory (file-truename "~/33-programmer/emacs.d"))
+       (setq default-directory (file-truename "~/34_01-linux-home/emacs.d"))
        (setq home-dir (file-truename "~/"))
        (setq custom-file (file-name-concat default-directory "custom.el"))))
 
