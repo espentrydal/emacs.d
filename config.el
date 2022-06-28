@@ -70,7 +70,14 @@
 (scroll-bar-mode -1)
 (setq inhibit-startup-screen t)
 ;; Theme
-(load-theme 'modus-vivendi)
+(use-package circadian
+  :config
+  (setq calendar-latitude 58.969975)
+  (setq calendar-longitude 5.733107)
+  (setq circadian-themes '((:sunrise . modus-operandi)
+                           (:sunset  . modus-vivendi)))
+  (circadian-setup))
+
 (use-package smart-mode-line
   :init
   (sml/setup))
@@ -141,7 +148,7 @@
                  (regular
                   :default-family "Iosevka Comfy"
                   :default-weight normal
-                  :default-height 150
+                  :default-height 145
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -156,7 +163,7 @@
                  (medium
                   :default-family "Source Code Pro"
                   :default-weight normal
-                  :default-height 150
+                  :default-height 145
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -171,7 +178,7 @@
                  (large
                   :default-family "Iosevka Comfy"
                   :default-weight semilight
-                  :default-height 180
+                  :default-height 160
                   :fixed-pitch-family nil ; falls back to :default-family
                   :fixed-pitch-weight nil ; falls back to :default-weight
                   :fixed-pitch-height 1.0
@@ -245,6 +252,7 @@
           (lambda ()
             (local-set-key (kbd "å") 'dired-up-directory)))
 (global-set-key (kbd "<f7>") (lambda () (interactive) (find-file user-config-file)))
+(global-set-key (kbd "C-c C-i") 'ace-swap-window)
 ;; other hooks
 (add-hook 'text-mode-hook 'auto-fill-mode)
 (add-hook 'Info-mode-hook (progn (lambda () (variable-pitch-mode t))))
@@ -296,7 +304,7 @@
 (use-package perspective
   :bind ("C-x C-b" . persp-ibuffer)
   :custom
-  (persp-mode-prefix-key (kbd "C-z"))
+  (persp-mode-prefix-key (kbd "C-t"))
   (persp-state-default-file (file-name-concat user-emacs-directory "persp-exit"))
   :init (persp-mode)
   :config (add-hook 'kill-emacs-hook #'persp-state-save))
@@ -447,7 +455,7 @@
     (setq org-roam-capture-templates
           '(("d" "default" plain "%?"
              :target (file+head "${slug}.org"
-                                "#+title: ${title}\n#+date: %U\nTime-stamp: \" \" \n")
+                                "#+title: ${title}\n#+date: %U\nTime-stamp: \" \"\n")
              :immediate-finish t
              :unnarrowed t)
             ("r" "bibliography reference" plain "%?"
@@ -487,7 +495,7 @@
     (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
     (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
     (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete))
-
+ 
   ;; Slime
   (use-package slime
     :init (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
