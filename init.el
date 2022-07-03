@@ -9,7 +9,7 @@
          (add-to-list 'load-path default-directory)))
       (t
        ;; Linux og annet
-       (let ((default-directory "~/33-programmer/emacs.d"))
+       (let ((default-directory "~/34_01-linux-home/emacs.d"))
          (add-to-list 'load-path default-directory))))
 
 (require 'config)

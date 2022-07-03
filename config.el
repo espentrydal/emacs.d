@@ -122,6 +122,9 @@
   :config
   (require 'smartparens-config))
 
+; Nix-mode
+(use-package nix-mode
+  :mode "\\.nix\\'")
 ;; Markup modes
 (use-package markdown-mode)
 
