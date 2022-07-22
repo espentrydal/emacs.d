@@ -6,22 +6,26 @@
        (setq-default url-proxy-services '(("no_proxy" . "sus\\.no")
                                           ("http" . "proxy-ihn.ihelse.net:3128")
 			                              ("https" . "proxy-ihn.ihelse.net:3128")))
-       (setq default-directory "h:/33-programmer/emacs.d")
        (setq home-dir "h:/")
+       (setq default-directory "h:/33-programmer/emacs.d")
+       (setq prog-dir "h:/33-programmer/")
        (setq custom-file (file-name-concat default-directory "custom-win.el")))
       ((eq 'windows-nt system-type)
        ;; Windows
-       (setq default-directory "c:/33-programmer/emacs.d")
        (setq home-dir "c:/")
+       (setq default-directory "c:/34-programmer/emacs.d")
+       (setq prog-dir "h:/34-programmer/")
        (setq custom-file (file-name-concat default-directory "custom-win.el")))
       (t
        ;; Annet
-       (setq default-directory (file-truename "~/34_01-linux-home/emacs.d"))
        (setq home-dir (file-truename "~/"))
+       (setq default-directory (file-truename "~/34_01-linux-home/emacs.d"))
+       (setq prog-dir "~/34_01-linux-home/")
        (setq custom-file (file-name-concat default-directory "custom.el"))))
 
 (setq user-config-file (file-name-concat default-directory "config.el"))
 (load custom-file)
+(add-to-list 'Info-default-directory-list (file-name-concat prog-dir "info"))
 
 ;; Enable installation of packages via straight.el
 (defvar bootstrap-version)
@@ -31,7 +35,7 @@
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
          'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
@@ -539,7 +543,7 @@
   :straight (:host github :repo "emacs-straight/org-mode"
                    :build (autoloads compile info))
   :init
-  (setq org-directory (file-name-concat home-dir "02-org"))
+  (setq org-directory (file-name-concat home-dir "01-notater"))
   (setq org-special-ctrl-a/e 'reversed)
   (defun org-open-current-frame ()
     "Opens file in current frame."
@@ -570,8 +574,8 @@
 ;; Denote
 (use-package denote
   ;; Remember to check the doc strings of those variables.
-  (setq denote-directory (expand-file-name "~/Documents/notes/"))
-  (setq denote-known-keywords '("emacs" "philosophy" "politics" "economics"))
+  (setq denote-directory (expand-file-name (file-name-concat home-dir "01-notater/")))
+  (setq denote-known-keywords '("bibel" "emacs" "medisin" "flying"))
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
   (setq denote-file-type nil) ; Org is the default, set others here
@@ -601,11 +605,10 @@
   (require 'denote-dired)
   (setq denote-dired-rename-expert nil)
 
-  ;; We use different ways to specify a path for demo purposes.
   (setq denote-dired-directories
         (list denote-directory
               (thread-last denote-directory (expand-file-name "attachments"))
-              (expand-file-name "~/Documents/books")))
+              (thread-last denote-directory (expand-file-name "books")))
 
   ;; Generic (great if you rename files Denote-style in lots of places):
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode)
@@ -657,25 +660,42 @@
                    :jump-to-captured t))))
 
 ;; bibtex
-(setq bibtex-dialect 'biblatex)
-(setq bibtex-completion-bibliography '((file-name-concat home-dir "02-org/org-jobb/ref/my-library.bib"))
-      bibtex-completion-pdf-field "File"
-      bibtex-completion-notes-path (file-name-concat home-dir "02-org/org-jobb/ref/")
-      bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-	  bibtex-completion-additional-search-fields '(keywords journal)
-      bibtex-completion-pdf-symbol "⌘"
-      bibtex-completion-notes-symbol "✎"
-	  bibtex-completion-display-formats
-	  '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-	    (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
-      bibtex-completion-pdf-open-function (lambda (fpath)
-	                                        (call-process "open" nil 0 nil fpath)))
+;; (setq bibtex-dialect 'biblatex)
+;; (setq bibtex-completion-bibliography '((file-name-concat home-dir "02-org/org-jobb/ref/my-library.bib"))
+;;       bibtex-completion-pdf-field "File"
+;;       bibtex-completion-notes-path (file-name-concat home-dir "02-org/org-jobb/ref/")
+;;       bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+;; 	  bibtex-completion-additional-search-fields '(keywords journal)
+;;       bibtex-completion-pdf-symbol "⌘"
+;;       bibtex-completion-notes-symbol "✎"
+;; 	  bibtex-completion-display-formats
+;; 	  '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+;; 	    (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+;;       bibtex-completion-pdf-open-function (lambda (fpath)
+;; 	                                        (call-process "open" nil 0 nil fpath)))
 (use-package helm-bibtex
   :after helm
   :bind (:map org-mode-map ("C-c n B" . helm-bibtex)))
 (use-package org-ref
   :after org)
-(use-package citar)
+(use-package citar
+  :bind (("C-c b" . citar-insert-citation)
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset))
+  :custom
+  (citar-bibliography (file-name-concat home-dir "01-notater/bibtex/zotero.bib"))
+  (citar-global-bibliography (file-name-concat home-dir "01-notater/bibtex/zotero.bib"))
+  :config
+  (setq citar-templates
+        '((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
+          (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+          (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+          (note . "Notes on ${author editor}, ${title}"))))
+
+(use-package citar-embark
+  :after citar embark
+  :no-require
+  :config (citar-embark-mode))
 
 (unless (eq system-type 'windows-nt)
   (use-package org-attach-screenshot
